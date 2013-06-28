@@ -63,8 +63,8 @@ public class Client implements Runnable{
 		while(!stop) {
 			try {
 				int type = hostin.readInt();
-				if(type==10001)
-					frame.bases = new ArrayList<Base>();
+//				if(type==10001)
+//					frame.bases = new ArrayList<Base>();
 				if(type==10008)
 					frame.walls = new ArrayList<Wall>();
 				int num = hostin.readInt();
@@ -79,9 +79,10 @@ public class Client implements Runnable{
 						int points = hostin.readInt();
 						int totalworth = hostin.readInt();
 						int health = hostin.readInt();
-						Base b = new Base(new Color(red, gre, blu), x, y, width, points, totalworth);
+						int id = hostin.readInt();
+						Base b = new Base(new Color(red, gre, blu), x, y, width, points, totalworth, id);
 						b.health = health;
-						frame.bases.add(b);
+						frame.readBase(b);
 					} else if(type == 10002) {// ship
 						frame.startgame();
 						int red = hostin.readInt();
@@ -97,8 +98,7 @@ public class Client implements Runnable{
 							dead=true;
 						}
 						Ship ship = new Ship(new Color(red, gre, blu), x, y, dead, id, wid);
-						frame.removeShip(id);
-						frame.ships.add(ship);
+						frame.readShip(ship);
 					} else if(type == 10003) {// laser
 						int red = hostin.readInt();
 						int gre = hostin.readInt();
@@ -222,6 +222,18 @@ public class Client implements Runnable{
 							frame.pause(false);
 					} else if(type==10010) {// ping
 						frame.pinged();
+					} else if(type==10011) {// removebase
+						int red = hostin.readInt();
+						int gre = hostin.readInt();
+						int blu = hostin.readInt();
+						int x = hostin.readInt();
+						int y = hostin.readInt();
+						int width = hostin.readInt();
+						int points = hostin.readInt();
+						int totalworth = hostin.readInt();
+						int health = hostin.readInt();
+						int id = hostin.readInt();
+						frame.removeBase(id);
 					} else if(type==10012) {// game unavailable
 						frame.message="Game unavailable (either started or full)";
 					}

@@ -27,7 +27,7 @@ public class Ship {
 	public int ATTACKCD;
 	public final int id;
 	int supe;
-	public Ship(Color spl, int sx, int sy, boolean de, int nid, int wid) {
+	public Ship(Color spl, int sx, int sy, boolean de, int nid, int wid) {// create virtual
 		id=nid;
 		player = spl;
 		dead = de;
@@ -36,7 +36,7 @@ public class Ship {
 		width = wid;
 		half = wid/2;
 	}
-	public Ship(Color spl, int sx, int sy, int hp, int spd, int rng, int dmg, int attackcd, int wid, int sup) {
+	public Ship(Color spl, int sx, int sy, int hp, int spd, int rng, int dmg, int attackcd, int wid, int sup) {// actually create
 		supe = sup;
 		id=COUNTER++;
 		player = spl;

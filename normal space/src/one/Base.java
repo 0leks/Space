@@ -13,6 +13,8 @@ import javax.swing.ImageIcon;
 public class Base {
 	public static World world;
 	public static Image heart;
+	public final int id;
+	public static int COUNTER;
 	public Point cur;
 	public Color player;
 	public boolean dead;
@@ -34,6 +36,7 @@ public class Base {
 	public int ATTACKCD;
 	public int CHANCESUPER;
 	public Base(Color pla, int x, int y, int wi, int pnts) {// actually create a base
+		id = COUNTER++;
 		if(heart==null) {
 			ImageIcon ii = new ImageIcon("images/heart.png");
 			heart = ii.getImage();
@@ -57,7 +60,8 @@ public class Base {
 		REGEN = 1;
 		CHANCESUPER = 10;
 	}
-	public Base(Color pla, int x, int y, int wi, int pnts, int totalworth) {// create a virtual base
+	public Base(Color pla, int x, int y, int wi, int pnts, int totalworth, int sid) {// create a virtual base
+		id = sid;
 		if(heart==null) {
 			ImageIcon ii = new ImageIcon("images/heart.png");
 			heart = ii.getImage();
@@ -305,6 +309,7 @@ public class Base {
 		i.add(points);
 		i.add(totalworth);
 		i.add(health);
+		i.add(id);
 		return i;
 	}
 	public ArrayList<Integer> convertstats() {

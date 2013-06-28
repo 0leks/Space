@@ -149,6 +149,23 @@ public class Frame extends JFrame implements ActionListener{
 		t = new Timer(100, this);
 		t.start();
 	}
+	public void readBase(Base b) {
+		for(int a=0; a<bases.size(); a++) {
+			Base base = bases.get(a);
+			if(base.id==b.id){
+				bases.remove(a);
+			}
+		}
+		bases.add(b);
+	}
+	public void removeBase(int id) {
+		for(int a=0; a<bases.size(); a++) {
+			Base base = bases.get(a);
+			if(base.id==id){
+				bases.remove(a);
+			}
+		}
+	}
 	public void removeShip(int id) {
 		for(int a = 0; a<ships.size(); a++) {
 			Ship s = ships.get(a);
@@ -156,6 +173,15 @@ public class Frame extends JFrame implements ActionListener{
 				ships.remove(s);
 			}
 		}
+	}
+	public void readShip(Ship ship) {
+		for(int a = 0; a<ships.size(); a++) {
+			Ship s = ships.get(a);
+			if(s.id==ship.id) {
+				ships.remove(s);
+			}
+		}
+		ships.add(ship);
 	}
 	public void pause(boolean yes) {
 		if(yes) {

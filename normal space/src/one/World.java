@@ -250,6 +250,14 @@ public class World implements ActionListener{
 	}
 	public void removeBase(Base b) {
 		bases.remove(b);
+		ArrayList<Integer> i = new ArrayList<Integer>();
+		i.add(10011);
+		i.add(1);
+		i.addAll(b.convert());
+		for(int a=0; a<connections.size(); a++) {
+			Connection c = connections.get(a);
+			c.send(i);
+		}
 	}
 	public void removeShip(Ship s) {
 		for(Base b : bases) {
