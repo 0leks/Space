@@ -119,6 +119,7 @@ public class Frame extends JFrame implements ActionListener{
 		for(Component c : mypanel.getComponents()) {
 			if(c instanceof MyButton) {
 				buttons.add((MyButton)c);
+				((MyButton)c).setFocusable(false);
 			}
 		}
 
@@ -476,44 +477,12 @@ public class Frame extends JFrame implements ActionListener{
 		client.send(i);
 	}
 	public static void main(String[] arg) {
-		int server = JOptionPane.showConfirmDialog(null, "Connect to korshak server?");
-		boolean waiting;
-		if(server==0) {// yes
-			waiting = true;
-		} else if(server==1) {// no
-			waiting = false;
-		} else {// cancel
-			return;
-		}
-		System.out.println(server);
 		String s = JOptionPane.showInputDialog("IP?");
 		if(s==null)
 			return;
 		if(s.equals(""))
 			s="localhost";
-		int world = -1;
-		if(waiting) {
-			boolean valid=false;
-			while(!valid) {
-				String ss = JOptionPane.showInputDialog("World? (0-7)");
-				if(ss==null)
-					return;
-				try {
-					int w = Integer.parseInt(ss);
-					if(w>=0 && w<8) {
-						world = w;
-						valid=true;
-					}
-				} catch (Exception e) {
-					return;
-				}
-			}
-		}
-		if(waiting) {
-			Frame fr = new Frame(s, world);
-		} else {
-			Frame fr = new Frame(s);
-		}
+		Frame fr = new Frame(s);
 	}
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
