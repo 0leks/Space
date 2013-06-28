@@ -80,12 +80,17 @@ public class World implements ActionListener{
 		info.setTitle("Space Console  (Server Created)");
 		t = new Timer(100, this);
 		t.start();
-//		Ship ship = new Ship(Color.blue, 300, 300, 999999, 0, 9999, 1, 1, 10, 0);
-//		ships.add(ship);
-//		ship = new Ship(Color.red, 400, 300, 999999, 0, 9999, 1, 4, 10, 0);
-//		ships.add(ship);
-//		ship = new Ship(Color.green, 400, 400, 999999, 0, 9999, 1, 8, 10, 0);
-//		ships.add(ship);
+	}
+	public boolean hasSpace() {
+		if(randomspawn) {
+			if(bases.size()>=20)
+				return false;
+		} else {
+			if(bases.size()>=8) {
+				return false;
+			}
+		}
+		return true;
 	}
 	public boolean gamestarted() {
 		return gamestarted;
@@ -96,7 +101,6 @@ public class World implements ActionListener{
 	public void removeConnection(one.Connection connection) {
 		if(connections.remove(connection)) {
 			playerDisconnected(connection.player);
-			
 		}
 	}
 	public boolean tooclose(int x, int y) {

@@ -32,8 +32,7 @@ import java.util.ArrayList;
 	wall 10008
 	Pause 10009
 	Ping 10010
-	Connected 10011
-	Game Full 10012
+	Game Unavailable 10012
 */
 public class Client implements Runnable{
 	Socket socket;
@@ -223,10 +222,8 @@ public class Client implements Runnable{
 							frame.pause(false);
 					} else if(type==10010) {// ping
 						frame.pinged();
-					} else if(type==10011) {// connected
-						frame.waiting=false;
-					} else if(type==10012) {// game full
-						
+					} else if(type==10012) {// game unavailable
+						frame.message="Game unavailable (either started or full)";
 					}
 				}
 			} catch (IOException e) {

@@ -64,96 +64,8 @@ public class Frame extends JFrame implements ActionListener{
 	boolean tutorial = true;
 	Image tutor;
 	long ping = 0;
-	boolean waiting;
 	int world;
-	public Frame(String ip, int sworld) {
-		waiting = true;
-		world = sworld;
-		ImageIcon ii = new ImageIcon("images/star.gif");
-		star = ii.getImage();
-		ii = new ImageIcon("images/meteor.png");
-		Meteor.image = ii.getImage();
-		ii = new ImageIcon("images/tutorial.png");
-		tutor = ii.getImage();
-		stars = new ArrayList<Point>();
-	
-		ships = new ArrayList<Ship>();
-		bases = new ArrayList<Base>();
-		lasers = new ArrayList<Laser>();
-		walls = new ArrayList<Wall>();
-		buttons = new ArrayList<MyButton>();
-		mypanel = new Panel();
-
-		this.add(mypanel);
-		mypanel.setSize(Toolkit.getDefaultToolkit().getScreenSize());
-		updamage = new MyButton("DAMAGE", 1, '1');
-		updamage.setToolTipText("Damage dealt per laser.");
-		initbutton(updamage, mypanel.getWidth()-110, 70, 100, 50);
-		uprange = new MyButton("RANGE", 2, '2');
-		uprange.setToolTipText("Maximum length of a laser.");
-		initbutton(uprange, mypanel.getWidth()-110, 130, 100, 50);
-		upspeed = new MyButton("SPEED", 3, '3');
-		upspeed.setToolTipText("Movement speed of each ship.");
-		initbutton(upspeed, mypanel.getWidth()-110, 190, 100, 50);
-		uphealth = new MyButton("HEALTH", 4, '4');
-		uphealth.setToolTipText("Maximum health of each ship");
-		initbutton(uphealth, mypanel.getWidth()-110, 250, 100, 50);
-		upattackcd = new MyButton("ATTACKSP", 7, '5');
-		upattackcd.setToolTipText("How frequently your base and ships shoot lasers.");
-		initbutton(upattackcd, mypanel.getWidth()-110, 310, 100, 50);
-		
-
-		upmaxships = new MyButton("MAXSHIPS", 5, '6');
-		upmaxships.setToolTipText("The total number of ships your base can support.");
-		initbutton(upmaxships, mypanel.getWidth()-110, 440, 100, 50);
-		upbuildcd = new MyButton("BUILDSP", 6, '7');
-		upbuildcd.setToolTipText("The time it takes to build a ship.");
-		initbutton(upbuildcd, mypanel.getWidth()-110, 500, 100, 50);
-		upregen = new MyButton("BASEHP", 8, '8');
-		upregen.setToolTipText("TotalBaseHealth= 1000 + BASEHP*100   BASEHP also increases base health regeneration.");
-		initbutton(upregen, mypanel.getWidth()-110, 560, 100, 50);
-		upsuper = new MyButton("SUPER", 9, '9');
-		upsuper.setToolTipText("% chance of building a Super.");
-		initbutton(upsuper, mypanel.getWidth()-110, 620, 100, 50);
-		
-		for(Component c : mypanel.getComponents()) {
-			if(c instanceof MyButton) {
-				buttons.add((MyButton)c);
-				((MyButton)c).setFocusable(false);
-			}
-		}
-
-		me = Color.white;
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setUndecorated(true);
-		this.setSize(Toolkit.getDefaultToolkit().getScreenSize());
-//		this.setTitle("Space");
-    	this.setLayout(null);
-    	mypanel.setLayout(null);
-        this.setLocationRelativeTo(null);
-        this.setResizable(false);
-		this.setFocusable(true);
-		this.addMouseListener(new Listener());
-		this.addMouseMotionListener(new Listener());
-		this.addKeyListener(new Listener());
-		this.validate();
-		for(int a=0; a<100; a++) {
-			stars.add(new Point((int) (Math.random()*getWidth()), (int)(Math.random()*getHeight())));
-		}
-		this.repaint();
-        this.setVisible(true);
-		this.requestFocus();
-		
-
-		message="Connecting to "+ip+" ...";
-		client = new Client(this, ip);
-		message="Failed to connect to "+ip+" ...";
-		client.start();
-		t = new Timer(100, this);
-		t.start();
-	}
 	public Frame(String ip) {
-		waiting = false;
 		ImageIcon ii = new ImageIcon("images/star.gif");
 		star = ii.getImage();
 		ii = new ImageIcon("images/meteor.png");
@@ -486,9 +398,6 @@ public class Frame extends JFrame implements ActionListener{
 	}
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		if(waiting) {
-			client.send(10000+world);
-		}
 		for(int a=lasers.size()-1; a>=0 && !pause; a--) {
 			Laser l = lasers.get(a);
 			l.tic();
