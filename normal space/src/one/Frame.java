@@ -116,6 +116,7 @@ public class Frame extends JFrame implements ActionListener{
 		for(Component c : mypanel.getComponents()) {
 			if(c instanceof MyButton) {
 				buttons.add((MyButton)c);
+				((MyButton)c).setFocusable(false);
 			}
 		}
 
