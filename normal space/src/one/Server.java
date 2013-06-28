@@ -8,13 +8,14 @@ public class Server implements Runnable{
 	public ServerSocket server;
 	public World world;
 	Socket sock;
-//	PrintWriter System.out.;
-//	BufferedReader hostin;
-//	DataOutputStream hostout;
 	Thread thread;
-	public Server(World w) {
-		world = w;
+	public Server() {
 		thread = new Thread(this);
+		world = new World(this);
+	}
+	public static void main(String[] args) {
+		Server s = new Server();
+		s.start();
 	}
 	public void start() {
 		thread.start();
@@ -22,10 +23,9 @@ public class Server implements Runnable{
 	@Override
 	public void run() {
 		try {
-//			System.out. = new PrintWriter(new BufferedWriter(new FileWriter("System.out..txt")));
 			System.out.println("Creating Server");
 			server = new ServerSocket(34555);
-			for(int a=0; true; a++) {
+			while(true) {
 				System.out.println("Accepting socket");
 				sock = server.accept();
 				System.out.println("making reader");

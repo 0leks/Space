@@ -44,12 +44,11 @@ public class World implements ActionListener{
 	ArrayList<Connection> connections;
 	MFrame mframe;
 	TFrame info;
-	boolean withframe;
 	boolean gamepaused;
 	boolean randomspawn;
 	final int startingpoints;
-	public World(boolean withfram) {
-		withframe=withfram;
+	public World(Server s) {
+		server = s;
 		mframe = new MFrame();
 		info = new TFrame();
 		mframe.setTitle("Space Spectating Client");
@@ -76,8 +75,8 @@ public class World implements ActionListener{
 		Base.world = this;
 		Ship.world = this;
 		Laser.world = this;
-		server = new Server(this);
-		server.start();
+//		server = new Server(this);
+//		server.start();
 		info.setTitle("Space Console  (Server Created)");
 		t = new Timer(100, this);
 		t.start();
@@ -452,11 +451,7 @@ public class World implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		tic();
-		if(withframe)
-			mframe.repaint();
-	}
-	public static void main(String[] a) {
-		new World(true);
+		mframe.repaint();
 	}
 	public class MFrame extends JFrame implements MouseListener{
 		Point pressed;
@@ -480,7 +475,7 @@ public class World implements ActionListener{
 			this.add(p, BorderLayout.CENTER);
 			this.validate();
 			this.repaint();
-	        this.setVisible(withframe);
+	        this.setVisible(true);
 			this.requestFocus();
 		}
 		@Override
@@ -577,7 +572,7 @@ public class World implements ActionListener{
 			this.addKeyListener(this);
 			this.validate();
 			this.repaint();
-	        this.setVisible(withframe);
+	        this.setVisible(true);
 			this.requestFocus();
 		}
 		@Override
