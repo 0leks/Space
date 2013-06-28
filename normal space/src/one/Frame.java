@@ -29,9 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 
 public class Frame extends JFrame implements ActionListener{
-//	static World m+363yworld;
 	
-	public boolean mousedown;
 	Panel mypanel;
 	ArrayList<Point> stars;
 	public Image star;
@@ -319,36 +317,26 @@ public class Frame extends JFrame implements ActionListener{
 	public class Listener implements ActionListener, MouseListener, MouseMotionListener, KeyListener {
 		@Override
 		public void mouseClicked(MouseEvent arg0) {
-			// TODO Auto-generated method stub
 			
 		}
 		@Override
 		public void mouseEntered(MouseEvent e) {
-			if(mousedown) {
-				//myworld.playerclicking(me, e.getPoint());
-			}
 		}
 
 		@Override
 		public void mouseExited(MouseEvent e) {
-			if(mousedown) {
-				//myworld.playerclicking(me, e.getPoint());
-			}
 		}
 
 		@Override
 		public void mousePressed(MouseEvent e) {
-			mousedown = true;
 		}
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			mousedown = false;
-//			myworld.frameinteracted(convertmovetostring(e));
-			client.send(convertmovetostring(e));
 			if(e.getX()>getWidth()-20 && e.getY()>getHeight()-20) {
 				client.stop();
 				System.exit(0);
+				return;
 			}
 			if(e.getX()<20 && e.getY()<20) {
 				ArrayList<Integer> i = new ArrayList<Integer>();
@@ -359,7 +347,9 @@ public class Frame extends JFrame implements ActionListener{
 				client.send(i);
 				ping = System.currentTimeMillis();
 				System.out.println("pinging");
+				return;
 			}
+			client.send(convertmovetostring(e));
 		}
 		@Override
 		public void mouseDragged(MouseEvent e) {
@@ -381,7 +371,6 @@ public class Frame extends JFrame implements ActionListener{
 		}
 		@Override
 		public void keyPressed(KeyEvent arg0) {
-			// TODO Auto-generated method stub
 			
 		}
 		@Override
@@ -401,7 +390,6 @@ public class Frame extends JFrame implements ActionListener{
 		}
 		@Override
 		public void keyTyped(KeyEvent arg0) {
-			// TODO Auto-generated method stub
 			
 		}
 	}
