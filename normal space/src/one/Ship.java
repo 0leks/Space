@@ -59,10 +59,10 @@ public class Ship {
 			world.removeShip(this);
 			return;
 		}
-		if(!world.collides(new Rectangle(cur.x+dx-HALF, cur.y-HALF, WIDTH, WIDTH), this)) {
+		if(!world.collides(new Rectangle(cur.x+dx-half, cur.y-half, width, width), this)) {
 			cur = new Point(cur.x+dx, cur.y);
 		}
-		if(!world.collides(new Rectangle(cur.x-HALF, cur.y+dy-HALF, WIDTH, WIDTH), this)) {
+		if(!world.collides(new Rectangle(cur.x-half, cur.y+dy-half, width, width), this)) {
 			cur = new Point(cur.x, cur.y+dy);
 		}
 		if(this.collides(world.met)) {
