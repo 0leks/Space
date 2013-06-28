@@ -32,13 +32,13 @@ public class Server implements Runnable{
 				DataInputStream hostin = new DataInputStream(sock.getInputStream());
 				System.out.println("Creating outputstream");
 				DataOutputStream hostout = new DataOutputStream(sock.getOutputStream());
-				if(world.gamestarted() || !world.hasSpace()) {
+				if(world.canJoin()) {
+					world.addConnection(new Connection(world, hostin, hostout));
+				} else {
 					hostout.writeInt(10012);
 					hostout.writeInt(1);
 					hostin.close();
 					hostout.close();
-				} else {
-					world.addConnection(new Connection(world, hostin, hostout));
 				}
 			}
 		} catch (IOException e) {

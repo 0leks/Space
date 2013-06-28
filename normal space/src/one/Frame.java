@@ -387,7 +387,6 @@ public class Frame extends JFrame implements ActionListener{
 		@Override
 		public void keyReleased(KeyEvent e) {
 			for(MyButton b : buttons) {
-				System.out.println("checking button");
 				if(e.getKeyChar()==b.hotkey) {
 					buttonpressed(b);
 				}

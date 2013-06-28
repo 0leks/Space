@@ -81,6 +81,15 @@ public class World implements ActionListener{
 		t = new Timer(100, this);
 		t.start();
 	}
+	public boolean canJoin() {
+		if(!hasSpace())
+			return false;
+		if(gamestarted()) {
+			if(disconnected.size()<=0)
+				return false;
+		}
+		return true;
+	}
 	public boolean hasSpace() {
 		if(randomspawn) {
 			if(bases.size()>=20)
