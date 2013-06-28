@@ -214,8 +214,8 @@ public class Client implements Runnable{
 							frame.pause(true);
 						} else if(p==0)
 							frame.pause(false);
-					} else if(type==10010) {// ping
-						frame.pinged();
+//					} else if(type==10010) {// ping
+//						frame.pinged();
 					} else if(type==10011) {// removebase
 						int red = hostin.readInt();
 						int gre = hostin.readInt();

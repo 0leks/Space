@@ -120,8 +120,8 @@ public class Connection implements Runnable{
 						base.upsuper();
 				} else if(type == 10003) {// disconnect
 					world.removeConnection(this);
-				} else if(type==10004) {// ping
-					world.ping(color);
+//				} else if(type==10004) {// ping
+//					world.ping(color);
 				} else if(type==10005) {// ready
 					ready = true;
 				}

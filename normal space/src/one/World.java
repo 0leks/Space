@@ -120,17 +120,17 @@ public class World implements ActionListener{
 		}
 		return false;
 	}
-	public void ping(Color c) {
-		for(int a=0; a<connections.size(); a++) {
-			Connection con = connections.get(a);
-			if(con.player.equals(c)) {
-				ArrayList<Integer> i = new ArrayList<Integer>();
-				i.add(10010);
-				i.add(1);
-				con.send(i);
-			}
-		}
-	}
+//	public void ping(Color c) {
+//		for(int a=0; a<connections.size(); a++) {
+//			Connection con = connections.get(a);
+//			if(con.player.equals(c)) {
+//				ArrayList<Integer> i = new ArrayList<Integer>();
+//				i.add(10010);
+//				i.add(1);
+//				con.send(i);
+//			}
+//		}
+//	}
 	public boolean colortooclose(Color c) {
 		int MIN = 150;
 		for(Base b : bases) {

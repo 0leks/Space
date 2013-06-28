@@ -308,7 +308,7 @@ public class Frame extends JFrame implements ActionListener{
 		g.drawString(""+b.hotkey, b.getLocation().x+1, b.getLocation().y+45);
 	}
 	public void pinged() {
-		long dif = ping-System.currentTimeMillis();
+		long dif = System.currentTimeMillis()-ping;
 		pingtime = "ping: "+dif;
 	}
 	public class Listener implements ActionListener, MouseListener, MouseMotionListener, KeyListener {
@@ -335,17 +335,17 @@ public class Frame extends JFrame implements ActionListener{
 				System.exit(0);
 				return;
 			}
-			if(e.getX()<20 && e.getY()<20) {
-				ArrayList<Integer> i = new ArrayList<Integer>();
-				i.add(10004);
-				i.add(me.getRed());
-				i.add(me.getGreen());
-				i.add(me.getBlue());
-				client.send(i);
-				ping = System.currentTimeMillis();
-				System.out.println("pinging");
-				return;
-			}
+//			if(e.getX()<20 && e.getY()<20) {
+//				ArrayList<Integer> i = new ArrayList<Integer>();
+//				i.add(10004);
+//				i.add(me.getRed());
+//				i.add(me.getGreen());
+//				i.add(me.getBlue());
+//				client.send(i);
+//				ping = System.currentTimeMillis();
+//				System.out.println("pinging");
+//				return;
+//			}
 			client.send(convertmovetostring(e));
 		}
 		@Override
