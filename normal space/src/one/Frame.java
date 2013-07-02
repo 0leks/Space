@@ -268,6 +268,9 @@ public class Frame extends JFrame implements ActionListener{
 			}
 			g.setColor(Color.white);
 			g.fillRect(getWidth()-20, getHeight()-20, 20, 20);
+			g.setColor(Color.black);
+			g.setFont(new Font("Arial", Font.PLAIN, 14));
+			g.drawString("DC", getWidth()-20, getHeight()-4);
 			g.setFont(new Font("Arial", Font.PLAIN, 50));
 			g.drawString(message, 20, getHeight()/2);
 			if(tutorial) {

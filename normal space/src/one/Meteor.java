@@ -48,6 +48,9 @@ public class Meteor {
 				y-=dy;
 			}
 		}
+		state.add(x);
+		state.add(y);
+		state.add(width);
 	}
 	public void collidedwith(Ship s) {
 		s.damage(5);
@@ -73,7 +76,6 @@ public class Meteor {
 		return width==0;
 	}
 	public void disable() {
-//		System.out.println("met is disabled");
 		x = -999;
 		y = -999;
 		dx = 0;

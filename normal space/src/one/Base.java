@@ -50,7 +50,6 @@ public class Base {
 		numships = 0;
 		MAXSHIPS = 15;
 		BUILDCD = 15;
-//		BUILDCD = 2;
 		buildcd = BUILDCD;
 		RANGE = 50;
 		HEALTH = 10;

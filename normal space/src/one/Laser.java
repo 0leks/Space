@@ -44,6 +44,18 @@ public class Laser {
 		damage = dmg;
 		player = c;
 		timetohit = time;
+		
+		state.add(player.getRed());
+		state.add(player.getGreen());
+		state.add(player.getBlue());
+		state.add(cur.x);
+		state.add(cur.y);
+		state.add(damage);
+		state.add(this.timetohit);
+		state.add(0);
+		state.add(3);
+		state.add(0);
+		state.add(0);
 	}
 	public void draw(Graphics2D g) {
 		g.setColor(player);
@@ -51,6 +63,20 @@ public class Laser {
 			g.drawLine(cur.x, cur.y, tar1.cur.x, tar1.cur.y);
 		if(tar2!=null)
 			g.drawLine(cur.x, cur.y, tar2.cur.x, tar2.cur.y);
+	}
+	public int tarx() {
+		if(tar1!=null)
+			return tar1.cur.x;
+		if(tar2!=null)
+			return tar2.cur.x;
+		return 0;
+	}
+	public int tary() {
+		if(tar1!=null)
+			return tar1.cur.y;
+		if(tar2!=null)
+			return tar2.cur.y;
+		return 0;
 	}
 	public void tic() {
 		if(timetohit--<0) {

@@ -89,14 +89,18 @@ public class Ship {
 			}
 		}
 		if(shoot--<0) {
-			Ship tar = world.getinrange(this);
 			Base bas = world.getbaseinrange(this);
 			if(bas!=null) {
 				Laser l = new Laser(cur.x, cur.y, bas, DAMAGE, player, ATTACKCD, false);
-				world.addLaser(l);
-			} else if(tar!=null) {
-				Laser l = new Laser(cur.x, cur.y, tar, DAMAGE, player, ATTACKCD, false);
-				world.addLaser(l);
+				if(!world.collides(l))
+					world.addLaser(l);
+			} else  {
+				Ship tar = world.getinrange(this);
+				if(tar!=null) {
+					Laser l = new Laser(cur.x, cur.y, tar, DAMAGE, player, ATTACKCD, false);
+					if(!world.collides(l))
+						world.addLaser(l);
+				}
 			} 
 			int sub = 0;
 			for(int a=13-ATTACKCD; a<13; a++) {

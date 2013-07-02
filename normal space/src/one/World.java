@@ -120,17 +120,6 @@ public class World implements ActionListener{
 		}
 		return false;
 	}
-//	public void ping(Color c) {
-//		for(int a=0; a<connections.size(); a++) {
-//			Connection con = connections.get(a);
-//			if(con.player.equals(c)) {
-//				ArrayList<Integer> i = new ArrayList<Integer>();
-//				i.add(10010);
-//				i.add(1);
-//				con.send(i);
-//			}
-//		}
-//	}
 	public boolean colortooclose(Color c) {
 		int MIN = 150;
 		for(Base b : bases) {
@@ -146,8 +135,6 @@ public class World implements ActionListener{
 		connection.start();
 		System.out.println("Adding connection");
 		Color co;
-//		int rand = (int)(Math.random()*3);
-		
 		if(disconnected.size()>0)
 			co = disconnected.remove(0);
 		else {
@@ -155,10 +142,8 @@ public class World implements ActionListener{
 				co = Color.getHSBColor((float)(Math.random()), (float)(Math.random()*.5+.5), (float)(Math.random()*.5+.5));
 			} while(colortooclose(co));
 		}
-//			co = new Color((int)(Math.random()*150+50), (int)(Math.random()*150+50), (int)(Math.random()*150+50));
 		Base b = this.getbase(co);
 		if(b==null) {
-//			for(int a=0; a<8; a++) {
 			if(randomspawn) {
 				int x=0;
 				int y=0;
@@ -171,7 +156,7 @@ public class World implements ActionListener{
 			} else {
 				if(con==0) {
 					b = new Base(co, 200, 100, 40, startingpoints);
-	//				walls.add(new Wall(350, 0, 10, 150));
+					walls.add(new Wall(350, 0, 10, 150));
 				}
 				if(con==1) {
 					b = new Base(co, 800, 100, 40, startingpoints);
@@ -187,8 +172,8 @@ public class World implements ActionListener{
 				}
 				if(con==4) {
 					b = new Base(co, 500, 50, 40, startingpoints);
-	//				walls.add(new Wall(600, 0, 10, 150));
-	//				walls.add(new Wall(350, 0, 10, 150));
+					walls.add(new Wall(600, 0, 10, 150));
+					walls.add(new Wall(350, 0, 10, 150));
 				}
 				if(con==5) {
 					b = new Base(co, 100, 350, 40, startingpoints);
@@ -209,6 +194,15 @@ public class World implements ActionListener{
 //			}
 		}
 		connection.setPlayer(b.player);
+	}
+	public boolean collides(Laser l) {
+		for(Wall w : walls) {
+			Rectangle r = new Rectangle(w.x, w.y, w.w, w.h);
+			if(r.intersectsLine(l.cur.x, l.cur.y, l.tarx(), l.tary())) {
+				return true;
+			}
+		}
+		return false;
 	}
 	public boolean collides(Rectangle r, Ship ship) {
 		for(Ship s : ships) {
@@ -260,7 +254,7 @@ public class World implements ActionListener{
 	public void removeBase(Base b) {
 		bases.remove(b);
 		ArrayList<Integer> i = new ArrayList<Integer>();
-		i.add(10011);
+		i.add(Client.REMOVEBASE);
 		i.add(1);
 		i.addAll(b.convert());
 		for(int a=0; a<connections.size(); a++) {
@@ -276,7 +270,7 @@ public class World implements ActionListener{
 		}
 		ships.remove(s);
 		ArrayList<Integer> i = new ArrayList<Integer>();
-		i.add(10007);
+		i.add(Client.REMOVESHIP);
 		i.add(1);
 		i.addAll(s.convert());
 		for(int a=0; a<connections.size(); a++) {
@@ -327,7 +321,7 @@ public class World implements ActionListener{
 	}
 	public void pause() {
 		ArrayList<Integer> send = new ArrayList<Integer>();
-		send.add(10009);
+		send.add(Client.PAUSE);
 		send.add(1);
 		if(gamepaused) {
 			System.out.println("pausing");
@@ -347,7 +341,7 @@ public class World implements ActionListener{
 	}
 	public void sendlaser(Laser l) {
 		ArrayList<Integer> i = new ArrayList<Integer>();
-		i.add(10003);
+		i.add(Client.LASER);
 		i.add(1);
 		i.addAll(l.convert());
 		for(int a=0; a<connections.size(); a++) {
@@ -398,7 +392,7 @@ public class World implements ActionListener{
 	}
 	public void sendStats(Connection c) {
 		ArrayList<Integer> i = new ArrayList<Integer>();
-		i.add(10004);
+		i.add(Client.STATS);
 		i.add(1);
 		Base b = this.getbase(c.player);
 		if(b==null)
@@ -408,7 +402,7 @@ public class World implements ActionListener{
 	}
 	public ArrayList<Integer> convertwalls() {
 		ArrayList<Integer> i = new ArrayList<Integer>();
-		i.add(10008);
+		i.add(Client.WALL);
 		i.add(walls.size());
 		for(Wall w : walls) {
 			i.addAll(w.convert());
@@ -417,7 +411,7 @@ public class World implements ActionListener{
 	}
 	public ArrayList<Integer> convertbases() {
 		ArrayList<Integer> i = new ArrayList<Integer>();
-		i.add(10001);
+		i.add(Client.BASE);
 		i.add(bases.size());
 		for(Base b : bases) {
 			i.addAll(b.convert());
@@ -426,7 +420,7 @@ public class World implements ActionListener{
 	}
 	public ArrayList<Integer> convertships() {
 		ArrayList<Integer> i = new ArrayList<Integer>();
-		i.add(10002);
+		i.add(Client.SHIP);
 		i.add(ships.size());
 		for(Ship s : ships) {
 			i.addAll(s.convert());
@@ -435,7 +429,7 @@ public class World implements ActionListener{
 	}
 	public ArrayList<Integer> convertMeteor() {
 		ArrayList<Integer> i = new ArrayList<Integer>();
-		i.add(10006);
+		i.add(Client.METEOR);
 		i.add(1);
 		i.addAll(met.convert());
 		return i;
