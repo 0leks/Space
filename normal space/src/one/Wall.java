@@ -7,19 +7,20 @@ import java.util.ArrayList;
 
 public class Wall {
 	int x, y, w, h;
+	ArrayList<Integer> state = new ArrayList<Integer>();
 	public Wall(int xx, int yy, int ww, int hh) {
 		x = xx;
 		y = yy;
 		w = ww;
 		h = hh;
+		state.add(x);
+		state.add(y);
+		state.add(w);
+		state.add(h);
+		
 	}
 	public ArrayList<Integer> convert() {
-		ArrayList<Integer> ret = new ArrayList<Integer>();
-		ret.add(x);
-		ret.add(y);
-		ret.add(w);
-		ret.add(h);
-		return ret;
+		return state;
 	}
 	public void draw(Graphics2D g) {
 		g.setColor(Color.white);

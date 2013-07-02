@@ -13,10 +13,15 @@ public class Meteor {
 	public int dx, dy;
 	public int width = 60;
 	public int half = 30;
+	ArrayList<Integer> state = new ArrayList<Integer>();
+	
 	public Meteor(int sx, int sy, int w) {// virtual
 		x = sx;
 		y = sy;
 		width = w;
+		state.add(x);
+		state.add(y);
+		state.add(width);
 	}
 	public Meteor(Point start, int spd, Point end) {// actual create
 		System.out.println("creating meteor");
@@ -77,10 +82,9 @@ public class Meteor {
 		half=0;
 	}
 	public ArrayList<Integer> convert() {
-		ArrayList<Integer> i = new ArrayList<Integer>();
-		i.add(x);
-		i.add(y);
-		i.add(width);
-		return i;
+		state.set(0, x);
+		state.set(1, y);
+		state.set(2, width);
+		return state;
 	}
 }

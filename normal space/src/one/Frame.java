@@ -91,7 +91,7 @@ public class Frame extends JFrame implements ActionListener{
 		uphealth.setToolTipText("Maximum health of each ship");
 		initbutton(uphealth, mypanel.getWidth()-110, 250, 100, 50);
 		upattackcd = new MyButton("ATTACKSP", 7, '5');
-		upattackcd.setToolTipText("How frequently your base and ships shoot lasers.");
+		upattackcd.setToolTipText("How frequently your base and ships shoot lasers. (Max 8)");
 		initbutton(upattackcd, mypanel.getWidth()-110, 310, 100, 50);
 		
 
@@ -99,7 +99,7 @@ public class Frame extends JFrame implements ActionListener{
 		upmaxships.setToolTipText("The total number of ships your base can support.");
 		initbutton(upmaxships, mypanel.getWidth()-110, 440, 100, 50);
 		upbuildcd = new MyButton("BUILDSP", 6, '7');
-		upbuildcd.setToolTipText("The time it takes to build a ship.");
+		upbuildcd.setToolTipText("The time it takes to build a ship. (Min 5)");
 		initbutton(upbuildcd, mypanel.getWidth()-110, 500, 100, 50);
 		upregen = new MyButton("BASEHP", 8, '8');
 		upregen.setToolTipText("TotalBaseHealth= 1000 + BASEHP*100   BASEHP also increases base health regeneration.");

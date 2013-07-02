@@ -310,13 +310,19 @@ public class World implements ActionListener{
 				met.tic();
 			}
 		}
+		ArrayList<Integer> ships, bases, meteors, walls;
+		ships = convertships();
+		bases = convertbases();
+		meteors = convertMeteor();
+		walls = convertwalls();
+		
 		for(int a=0; a<connections.size(); a++) {
 			Connection c = connections.get(a);
-			c.send(convertships());
-			c.send(convertbases());
+			c.send(ships);
+			c.send(bases);
 			sendStats(c);
-			c.send(convertMeteor());
-			c.send(convertwalls());
+			c.send(meteors);
+			c.send(walls);
 		}
 	}
 	public void pause() {

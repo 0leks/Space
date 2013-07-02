@@ -15,6 +15,8 @@ public class Laser {
 	Color player;
 	boolean spec;
 	int timetohit;
+	ArrayList<Integer> state = new ArrayList<Integer>();
+	
 	public Laser(int x, int y, Ship s, int dmg, Color c, int time, boolean sp) {
 		spec = sp;
 		cur = new Point(x, y);
@@ -22,6 +24,18 @@ public class Laser {
 		damage = dmg;
 		player = c;
 		timetohit = time;
+		
+		state.add(player.getRed());
+		state.add(player.getGreen());
+		state.add(player.getBlue());
+		state.add(cur.x);
+		state.add(cur.y);
+		state.add(damage);
+		state.add(this.timetohit);
+		state.add(0);
+		state.add(3);
+		state.add(0);
+		state.add(0);
 	}
 	public Laser(int x, int y, Base b, int dmg, Color c, int time, boolean sp) {
 		spec = sp;
@@ -63,30 +77,31 @@ public class Laser {
 		}
 	}
 	public ArrayList<Integer> convert() {
-		ArrayList<Integer> i = new ArrayList<Integer>();
-		i.add(player.getRed());
-		i.add(player.getGreen());
-		i.add(player.getBlue());
-		i.add(cur.x);
-		i.add(cur.y);
-		i.add(damage);
-		i.add(this.timetohit);
-		if(hit)
-			i.add(1);
+		state.set(3, cur.x);
+		state.set(4, cur.y);
+		state.set(5, damage);
+		state.set(6, this.timetohit);
+		
+		if (hit)
+			state.set(7,1);
 		else
-			i.add(0);
+			state.set(7,0);
+			
 		if(tar1!=null) {
-			i.add(1);
-			i.add(tar1.getID());
+			state.set(8,1);
+			state.add(9,tar1.getID());
 		}
+		
 		if(tar2!=null) {
-			i.add(2);
-			i.add(tar2.cur.x);
-			i.add(tar2.cur.y);
+			state.set(8,2);
+			state.set(9,tar2.cur.x);
+			state.set(10,tar2.cur.y);
 		}
+		
 		if(tar1==null && tar2==null) {
-			i.add(3);
+			state.set(8,3);
 		}
-		return i;
+		
+		return state;
 	}
 }

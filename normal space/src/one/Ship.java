@@ -27,6 +27,9 @@ public class Ship {
 	public int ATTACKCD;
 	public final int id;
 	int supe;
+	
+	ArrayList<Integer> state = new ArrayList<Integer>();
+	
 	public Ship(Color spl, int sx, int sy, boolean de, int nid, int wid) {// create virtual
 		id=nid;
 		player = spl;
@@ -49,6 +52,15 @@ public class Ship {
 		dead = false;
 		width = wid;
 		half = wid/2;
+		
+		state.add(player.getRed());
+		state.add(player.getGreen());
+		state.add(player.getBlue());
+		state.add(cur.x);
+		state.add(cur.y);
+		state.add(id);
+		state.add(width);
+		state.add(0);	//alive
 	}
 	public void setD(int x, int y) {
 		dx = x;
@@ -100,6 +112,7 @@ public class Ship {
 		HEALTH-=dmg;
 		if(HEALTH<=0) {
 			dead = true;
+			state.set(7, 1);
 			return true;
 		}
 		return false;
@@ -145,19 +158,9 @@ public class Ship {
 		return id;
 	}
 	public ArrayList<Integer> convert() {
-		ArrayList<Integer> i = new ArrayList<Integer>();
-		i.add(player.getRed());
-		i.add(player.getGreen());
-		i.add(player.getBlue());
-		i.add(cur.x);
-		i.add(cur.y);
-		i.add(id);
-		i.add(width);
-		if(dead)
-			i.add(1);
-		else
-			i.add(0);
-		return i;
+		state.set(3, cur.x);
+		state.set(4, cur.y);
+		return state;
 	}
 //	public String toString() {
 //		String s = player.getRed()+" "+player.getGreen()+" "+player.getBlue()+" "+cur.x+" "+cur.y+" "+id+" ";
