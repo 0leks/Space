@@ -2,9 +2,14 @@ package one;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 /*
@@ -19,26 +24,40 @@ import java.util.ArrayList;
 	upbuildcd 6
 	upattackspeed 7
 	upregen 8
-	
-	Move 10001
-	Upgrade 10002
-	Disconnect 10003
-	Ping 10004
-	Ready 10005
 */
 public class Connection implements Runnable{
 	DataInputStream in;
 	DataOutputStream out;
+	PrintWriter out2;
 	World world;
 	Thread thread;
 	int life = 10;
 	boolean dc = false; 
 	Color player;
 	public boolean ready;
+	public static final int MOVE = 10001;
+	public static final int UPGRADE = 10002;
+	public static final int DISCONNECT = 10003;
+	public static final int MAKEWALL = 10004;
+	ArrayList<Integer> sendping;
+	public static int name = 0;
+	public boolean save = false;
 	public Connection(World w, DataInputStream i, DataOutputStream o) {
 		in = i;
 		out = o;
+		try {
+			out2 = new PrintWriter(new BufferedWriter(new FileWriter((name++) + "out.txt")));
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		world = w;
+		sendping = new ArrayList<Integer>();
+		sendping.add(Client.PING);
+		sendping.add(1);
 		thread = new Thread(this);
 		ready = false;
 	}
@@ -57,7 +76,10 @@ public class Connection implements Runnable{
 			return;
 		try {
 			for(Integer in : i) {
+//				System.out.println(in);
 				out.writeInt(in);
+				if(save)
+					out2.print(in);
 			}
 		}catch (IOException e) {
 			e.printStackTrace();
@@ -67,6 +89,7 @@ public class Connection implements Runnable{
 				try {
 					in.close();
 					out.close();
+					out2.close();
 					in = null;
 					out = null;
 					return;
@@ -90,11 +113,11 @@ public class Connection implements Runnable{
 				int gre = in.readInt();
 				int blu = in.readInt();
 				Color color = new Color(red, gre, blu);
-				if(type==10001) {// move
+				if(type==Connection.MOVE) {// move
 					int x = in.readInt();
 					int y = in.readInt();
 					world.playerclicking(color, new Point(x, y));
-				} else if(type==10002) {// upgrade
+				} else if(type==Connection.UPGRADE) {// upgrade
 					int id = in.readInt();
 					Base base = world.getbase(color);
 					if(base==null) {
@@ -118,12 +141,16 @@ public class Connection implements Runnable{
 						base.upregen();
 					if(id==9)
 						base.upsuper();
-				} else if(type == 10003) {// disconnect
+				} else if(type == Connection.DISCONNECT) {// disconnect
 					world.removeConnection(this);
-//				} else if(type==10004) {// ping
-//					world.ping(color);
-				} else if(type==10005) {// ready
-					ready = true;
+				} else if(type == Connection.MAKEWALL) {
+					int x = in.readInt();
+					int y = in.readInt();
+					int w = in.readInt();
+					int h = in.readInt();
+					world.buildWall(x, y, w, h);
+				} else if(type == Client.PING) {
+					this.send(sendping);
 				}
 			} catch (IOException e) {
 				if(!wait) {

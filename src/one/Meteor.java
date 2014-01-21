@@ -13,24 +13,23 @@ public class Meteor {
 	public int dx, dy;
 	public int width = 60;
 	public int half = 30;
-	ArrayList<Integer> state = new ArrayList<Integer>();
+	ArrayList<Integer> state;
 	
 	public Meteor(int sx, int sy, int w) {// virtual
 		x = sx;
 		y = sy;
 		width = w;
+		state = new ArrayList<Integer>();
 		state.add(x);
 		state.add(y);
 		state.add(width);
 	}
 	public Meteor(Point start, int spd, Point end) {// actual create
-		System.out.println("creating meteor");
 		x = start.x;
 		y = start.y;
 		int ddx = end.x-start.x;
 		int ddy = end.y-start.y;
 		if(ddx==0) {
-			System.out.println("dx=0, terminate");
 			disable();
 			return;
 		}
@@ -48,22 +47,25 @@ public class Meteor {
 				y-=dy;
 			}
 		}
+		state = new ArrayList<Integer>();
 		state.add(x);
 		state.add(y);
 		state.add(width);
 	}
 	public void collidedwith(Ship s) {
 		s.damage(5);
+//		x = (int)(Math.random()*1000+100);
+//		y = (int)(Math.random()*1000+100);
 		width+=2;
 		half+=1;
 	}
-	public void draw(Graphics2D g) {
+	public void draw(Graphics2D g, Point focus) {
 		g.setColor(Color.white);
-		g.fillRect(x-width/2, y-width/2, width, width);
+		g.fillRect(x-width/2-focus.x, y-width/2-focus.y, width, width);
 		g.setColor(Color.black);
 		g.setFont(new Font("Arial", 50, 10));
-		g.drawString("METEOR", x-width/2+6, y+5);
-		g.drawImage(image, x-width/2, y-width/2, width, width, null);
+		g.drawString("METEOR", x-width/2+6-focus.x, y+5-focus.y);
+		g.drawImage(image, x-width/2-focus.x, y-width/2-focus.y, width, width, null);
 	}
 	public void tic() {
 		x+=dx;

@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -15,6 +16,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
@@ -23,7 +27,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-public class World implements ActionListener{
+public class World implements ActionListener {
 	private ArrayList<Ship> ships;
 	private ArrayList<Base> bases;
 	private ArrayList<Laser> lasers;
@@ -42,17 +46,46 @@ public class World implements ActionListener{
 	final int METEORCD = 200;
 	Server server;
 	ArrayList<Connection> connections;
-	MFrame mframe;
-	TFrame info;
+	
+	public int WORLDX;
+	public int WORLDY;
+	ArrayList<Integer> WORLDINIT;
+	ArrayList<Integer> baseattacked;
+	
+//	MFrame mframe;
+	TFrame console;
+	BFrame options;
+	
 	boolean gamepaused;
 	boolean randomspawn;
 	final int startingpoints;
+	int cdtogivemoney;
 	public World(Server s) {
+		baseattacked = new ArrayList<Integer>();
+		baseattacked.add(Client.BASEATTACKED);
+		baseattacked.add(1);
+		WORLDINIT = new ArrayList<Integer>();
+		WORLDINIT.add(Client.WORLDSIZE);
+		WORLDINIT.add(1);
+		WORLDINIT.add(0);
+		WORLDINIT.add(0);
+		WORLDINIT.add(1);
 		server = s;
-		mframe = new MFrame();
-		info = new TFrame();
-		mframe.setTitle("Space Spectating Client");
-		info.setTitle("Space Console  (Creating Server)");
+		
+		options = new BFrame();
+//		mframe = new MFrame();
+		console = new TFrame();
+		
+//		mframe.setTitle("Space Spectating Client");
+		console.setTitle("Space Console  (Creating Server)");
+		options.setTitle("Space Server Creator");
+		
+		ImageIcon ii = new ImageIcon("resources/images/icon.png");// setting the space icon
+		Image icon = ii.getImage();
+//		mframe.setIconImage(icon);
+		console.setIconImage(icon);
+		options.setIconImage(icon);
+		
 		startingpoints = (int)(Math.random()*20+10);
 		connections = new ArrayList<Connection>();
 		ships = new ArrayList<Ship>();
@@ -70,16 +103,34 @@ public class World implements ActionListener{
 		available.add(Color.pink);
 		available.add(Color.GRAY);
 		met = new Meteor(0, 0, 0);
-		ImageIcon ii = new ImageIcon("images/meteor.png");
+		ii = new ImageIcon("resources/images/meteor.png");
 		Meteor.image = ii.getImage();
 		Base.world = this;
 		Ship.world = this;
 		Laser.world = this;
 //		server = new Server(this);
 //		server.start();
-		info.setTitle("Space Console  (Server Created)");
-		t = new Timer(100, this);
+		console.setTitle("Space Console  (Server Created)");
+		t = new Timer(50, this);
 		t.start();
+	}
+	public void setSizeOfWorld(int x, int y) {
+		WORLDX = x;
+		WORLDY = y;
+	}
+	/**
+	 * sends current worldsize and duperenabled to all clients
+	 */
+	public void updateWorld() {
+		WORLDINIT.set(2, WORLDX);
+		WORLDINIT.set(3, WORLDY);
+		WORLDINIT.set(4, Client.TRUE);
+		if(!superenabled) {
+			WORLDINIT.set(4, Client.FALSE);
+		}
+		for(int a=connections.size()-1; a>=0; a--) {
+			connections.get(a).send(WORLDINIT);
+		}
 	}
 	public boolean canJoin() {
 		if(!hasSpace())
@@ -92,8 +143,6 @@ public class World implements ActionListener{
 	}
 	public boolean hasSpace() {
 		if(randomspawn) {
-			if(bases.size()>=20)
-				return false;
 		} else {
 			if(bases.size()>=8) {
 				return false;
@@ -105,7 +154,7 @@ public class World implements ActionListener{
 		return gamestarted;
 	}
 	public boolean hasdisconnect() {
-		return disconnected.size()>0;
+		return (disconnected.size()>0);
 	}
 	public void removeConnection(one.Connection connection) {
 		if(connections.remove(connection)) {
@@ -115,12 +164,15 @@ public class World implements ActionListener{
 	public boolean tooclose(int x, int y) {
 		for(Base b : bases) {
 			int dist = Math.abs(b.cur.x-x)+Math.abs(b.cur.y-y);
-			if(dist<=200)
+			if(dist<=400)
 				return true;
 		}
 		return false;
 	}
-	public boolean colortooclose(Color c) {
+	public boolean isColorGood(Color c) {
+		int total = c.getBlue()+c.getRed()+c.getGreen();
+		if(total<75 || total>690)
+			return false;
 		int MIN = 150;
 		for(Base b : bases) {
 			Color p = b.player;
@@ -138,9 +190,12 @@ public class World implements ActionListener{
 		if(disconnected.size()>0)
 			co = disconnected.remove(0);
 		else {
+//			do {
+//				co = Color.getHSBColor((float)(Math.random()), (float)(Math.random()*.5+.5), (float)(Math.random()*.5+.5));
+//			} while(colortooclose(co));
 			do {
-				co = Color.getHSBColor((float)(Math.random()), (float)(Math.random()*.5+.5), (float)(Math.random()*.5+.5));
-			} while(colortooclose(co));
+				co = new Color((int)(Math.random()*6.4)*40, (int)(Math.random()*6.4)*40, (int)(Math.random()*6.4)*40);
+			} while(isColorGood(co));
 		}
 		Base b = this.getbase(co);
 		if(b==null) {
@@ -149,41 +204,41 @@ public class World implements ActionListener{
 				int y=0;
 				int w=(int)(Math.random()*10+40);
 				do {
-					x = (int)(Math.random()*900+50);
-					y = (int)(Math.random()*700+50);
+					x = (int)(Math.random()*(WORLDX-100)+50);
+					y = (int)(Math.random()*(WORLDY-100)+50);
 				} while (tooclose(x, y));
 				b = new Base(co, x, y, w, startingpoints);
 			} else {
 				if(con==0) {
-					b = new Base(co, 200, 100, 40, startingpoints);
-					walls.add(new Wall(350, 0, 10, 150));
+					b = new Base(co, 110, 110, 40, startingpoints);
+//					walls.add(new Wall(350, 0, 10, 150));
 				}
 				if(con==1) {
-					b = new Base(co, 800, 100, 40, startingpoints);
+					b = new Base(co, WORLDX-150, 110, 40, startingpoints);
 	//				walls.add(new Wall(750, 250, 250, 10));
 				}
 				if(con==2) {
-					b = new Base(co, 800, 650, 40, startingpoints);
+					b = new Base(co, WORLDX-150, WORLDY-150, 40, startingpoints);
 	//				walls.add(new Wall(650, 550, 10, 150));
 				}
 				if(con==3) {
-					b = new Base(co, 200, 650, 40, startingpoints);
+					b = new Base(co, 110, WORLDY-150, 40, startingpoints);
 	//				walls.add(new Wall(0, 500, 150, 10));
 				}
 				if(con==4) {
-					b = new Base(co, 500, 50, 40, startingpoints);
+					b = new Base(co, WORLDX/2-20, 60, 40, startingpoints);
 					walls.add(new Wall(600, 0, 10, 150));
 					walls.add(new Wall(350, 0, 10, 150));
 				}
 				if(con==5) {
-					b = new Base(co, 100, 350, 40, startingpoints);
+					b = new Base(co, 60, WORLDY/2-20, 40, startingpoints);
 	//				walls.add(new Wall(0, 200, 150, 10));
 				}
 				if(con==6) {
-					b = new Base(co, 900, 360, 40, startingpoints);
+					b = new Base(co, WORLDX-100, WORLDY/2-20, 40, startingpoints);
 				}
 				if(con==7){
-					b = new Base(co, 500, 700, 40, startingpoints);
+					b = new Base(co, WORLDX/2-20, WORLDY-100, 40, startingpoints);
 				}
 				if(con>7){
 					return;
@@ -194,6 +249,7 @@ public class World implements ActionListener{
 //			}
 		}
 		connection.setPlayer(b.player);
+		updateWorld();
 	}
 	public boolean collides(Laser l) {
 		for(Wall w : walls) {
@@ -220,7 +276,7 @@ public class World implements ActionListener{
 				return true;
 			}
 		}
-		if(r.x<0 || r.x+r.width>1200 || r.y<0 ||r.y+r.height>768) {
+		if(r.x<0 || r.x+r.width>WORLDX || r.y<0 ||r.y+r.height>WORLDY) {
 			return true;
 		}
 		return false;
@@ -236,9 +292,24 @@ public class World implements ActionListener{
 				return true;
 			}
 		}
-		if(r.x<0 || r.x+r.width>1200 || r.y<0 ||r.y+r.height>768) {
+		if(r.x<0 || r.x+r.width>WORLDX || r.y<0 ||r.y+r.height>WORLDY) {
 			return true;
 		}
+		return false;
+	}
+	public boolean wallcollides(Rectangle r) {
+//		System.out.println("checking collide");
+		for(Ship s : ships) {
+			if(s.collides(r)) {
+				return true;
+			}
+		}
+		for(Base b : bases) {
+			if(b.collides(r)) {
+				return true;
+			}
+		}
+//		System.out.println("walldidnt collide");
 		return false;
 	}
 	public void playerDisconnected(Color c) {
@@ -280,6 +351,16 @@ public class World implements ActionListener{
 	}
 	public void tic() {
 		if(gamestarted && !gamepaused) {
+			if(cdtogivemoney++>5) {
+				Base least = bases.get(0);
+				for(int a=1; a<bases.size(); a++) {
+					if(bases.get(a).totalworth<least.totalworth) {
+						least = bases.get(a);
+					}
+				}
+				gotshipkill(least.player);
+				cdtogivemoney=0;
+			}
 			for(int a=lasers.size()-1; a>=0; a--) {
 				Laser l = lasers.get(a);
 				l.tic();
@@ -297,7 +378,7 @@ public class World implements ActionListener{
 			if(meteorenabled) {
 				if(timeformeteor++>METEORCD) {
 					if((met!=null && met.disabled()) || met==null) {
-						met = new Meteor(new Point((int)(Math.random()*1200-100), (int)(Math.random()*1000-100)), 20, new Point((int)(Math.random()*1200-100), (int)(Math.random()*1000-100)));
+						met = new Meteor(new Point((int)(Math.random()*1200-100), (int)(Math.random()*1000-100)), (int)(Math.random()*10+15), new Point((int)(Math.random()*1200-100), (int)(Math.random()*1000-100)));
 						timeformeteor=0;
 					}
 				}
@@ -472,7 +553,7 @@ public class World implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		tic();
-		mframe.repaint();
+//		mframe.repaint();
 	}
 	public class MFrame extends JFrame implements MouseListener{
 		Point pressed;
@@ -496,8 +577,6 @@ public class World implements ActionListener{
 			this.add(p, BorderLayout.CENTER);
 			this.validate();
 			this.repaint();
-	        this.setVisible(true);
-			this.requestFocus();
 		}
 		@Override
 		public void mouseClicked(MouseEvent arg0) {	
@@ -518,6 +597,7 @@ public class World implements ActionListener{
 				met = new Meteor(pressed, 10, e.getPoint());
 		}
 	}
+	Point lookingat = new Point(0, 0);
 	public class Panel extends JPanel {
 		@Override
 		public void paintComponent(Graphics g) {
@@ -527,15 +607,16 @@ public class World implements ActionListener{
         	g2d.setRenderingHints(rh);
 			g2d.setColor(Color.black);
 			g2d.fillRect(0, 0, getWidth(), getHeight());
-			met.draw(g2d);
+			if(met!=null)
+				met.draw(g2d,lookingat);
 			for(Ship s:ships) {
-				s.draw(g2d);
+				s.draw(g2d, lookingat);
 			}
 			for(Base b : bases) {
-				b.draw(g2d);
+				b.draw(g2d, lookingat);
 			}
 			for(Laser l : lasers) {
-				l.draw(g2d);
+				l.draw(g2d, lookingat);
 			}
 			g.setFont(new Font("Arial", 50, 70));
 			if(!gamestarted) {
@@ -544,6 +625,8 @@ public class World implements ActionListener{
 			if(gamepaused) {
 				g.drawString("GAME PAUSED", 50, getHeight()/2+50);
 			}
+			g.setColor(Color.white);
+			g.drawRect(0-lookingat.x, 0-lookingat.y, WORLDX, WORLDY);
 		}
 	}
 	public class TFrame extends JFrame implements KeyListener, ActionListener{
@@ -593,8 +676,7 @@ public class World implements ActionListener{
 			this.addKeyListener(this);
 			this.validate();
 			this.repaint();
-	        this.setVisible(true);
-			this.requestFocus();
+	        this.setVisible(false);
 		}
 		@Override
 		public void keyPressed(KeyEvent e) {
@@ -603,7 +685,7 @@ public class World implements ActionListener{
 		public void keyReleased(KeyEvent e) {
 			if(e.getKeyCode()==KeyEvent.VK_SPACE) {
 				gamestarted = true;
-				info.setTitle("Space Console (Game Started)");
+				console.setTitle("Space Console (Game Started)");
 			}
 			if(e.getKeyCode()==KeyEvent.VK_BACK_SPACE) {
 				System.exit(0);
@@ -622,7 +704,15 @@ public class World implements ActionListener{
 				pause.setLocation(10, 10);
 				this.add(pause);
 				gamestarted = true;
-				info.setTitle("Space Console  (Game Started)");
+				console.setTitle("Space Console  (Game Started)");
+//				WORLDSIZE.set(2, WORLDX);
+//				WORLDSIZE.set(3, WORLDY);
+//				for(int a=connections.size()-1; a>=0; a--) {
+//					for(Integer i : WORLDSIZE) {
+//						System.out.println(i);
+//					}
+//					connections.get(a).send(WORLDSIZE);
+//				}
 			}
 			if(e.getSource()==meteor) {
 				meteorenabled=!meteorenabled;
@@ -636,6 +726,7 @@ public class World implements ActionListener{
 			}
 			if(e.getSource()==supers) {
 				superenabled=!superenabled;
+				updateWorld();
 				if(superenabled) {
 					supers.setText("Super On");
 				} else {
@@ -646,11 +737,25 @@ public class World implements ActionListener{
 				gamepaused=!gamepaused;
 				if(gamepaused) {
 					pause.setText("Resume");
-					info.setTitle("Space Console  (Game Paused)");
+					console.setTitle("Space Console  (Game Paused)");
 				} else {
 					pause.setText("Pause");
-					info.setTitle("Space Console  (Game Started)");
+					console.setTitle("Space Console  (Game Started)");
 				}
+				ArrayList<Integer> ships, bases, meteors, walls;
+				ships = convertships();
+				bases = convertbases();
+				meteors = convertMeteor();
+				walls = convertwalls();
+				System.out.println("SAVING");
+				connections.get(0).save = true;
+				connections.get(0).send(ships);
+				connections.get(0).send(bases);
+				sendStats(connections.get(0));
+				connections.get(0).send(meteors);
+				connections.get(0).send(walls);
+				connections.get(0).save = false;
+				connections.get(0).out2.close();
 				pause();	
 			}
 			if(e.getSource()==random) {
@@ -662,6 +767,123 @@ public class World implements ActionListener{
 				}
 			}
 			this.repaint();
+		}
+	}
+	public class BFrame extends JFrame implements KeyListener, ActionListener{
+		JButton startserver;
+		JButton small;
+		JButton medium;
+		JButton large;
+		JButton selected;
+		public BFrame() {
+			startserver = new JButton("Create");
+			startserver.addActionListener(this);
+			startserver.setVisible(true);
+			startserver.setSize(100, 50);
+			startserver.setLocation(10, 10);
+			this.add(startserver);
+			
+			medium = new JButton("Medium");
+			medium.addActionListener(this);
+			medium.setVisible(true);
+			medium.setSize(100, 50);
+			medium.setLocation(120, 10);
+			medium.setToolTipText("Arena Size");
+			this.add(medium);
+			selected = medium;
+			
+			large = new JButton("Large");
+			large.addActionListener(this);
+			large.setVisible(true);
+			large.setSize(100, 50);
+			large.setLocation(120, 10);
+			large.setToolTipText("Arena Size");
+			
+			small = new JButton("Small");
+			small.addActionListener(this);
+			small.setVisible(true);
+			small.setSize(100, 50);
+			small.setLocation(120, 10);
+			small.setToolTipText("Arena Size");
+			
+			this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			this.setTitle("Space Server Options");
+	    	this.setLayout(null);
+	    	this.setSize(780, 100);
+	        this.setLocationRelativeTo(null);
+	        this.setResizable(false);
+			this.setFocusable(true);
+			this.addKeyListener(this);
+			this.validate();
+			this.repaint();
+	        this.setVisible(true);
+			this.requestFocus();
+		}
+		@Override
+		public void keyPressed(KeyEvent e) {
+		}
+		@Override
+		public void keyReleased(KeyEvent e) {
+			if(e.getKeyCode()==KeyEvent.VK_BACK_SPACE) {
+				System.exit(0);
+			}
+		}
+		@Override
+		public void keyTyped(KeyEvent e) {
+		}
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if(e.getSource()==startserver) {
+				console.setTitle("Space Console  (Server Created)");
+				if(selected == small) {
+					setSizeOfWorld(1000, 800);
+				}
+				if(selected == medium) {
+					setSizeOfWorld(1500, 1300);
+				}
+				if(selected == large) {
+					setSizeOfWorld(2000, 1800);
+				}
+				this.setVisible(false);
+//				mframe.setVisible(true);
+				console.setVisible(true);
+			}
+			if(e.getSource()==small) {
+				this.remove(small);
+				this.add(medium);
+				selected = medium;
+			}
+			if(e.getSource()==medium) {
+				this.remove(medium);
+				this.add(large);
+				selected = large;
+			}
+			if(e.getSource()==large) {
+				this.remove(large);
+				this.add(small);
+				selected = small;
+			}
+			this.repaint();
+		}
+	}
+	public void buildWall(int x, int y, int w, int h) {
+		if(!wallcollides(new Rectangle(x, y, w, h))) {
+//			Wall newwall = new Wall(x, y, w, h);
+//			walls.add(newwall);
+		}
+	}
+	public Connection getConnection(Color c) {
+		for(int a=0; a<connections.size(); a++) {
+			if(connections.get(a).player.equals(c)) {
+				return connections.get(a);
+			}
+		}
+		return null;
+	}
+	public void baseAttacked(Base b) {
+		Connection con = getConnection(b.player);
+		if(con !=null && !con.dc){ 
+			con.send(this.baseattacked);
 		}
 	}
 }

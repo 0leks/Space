@@ -28,6 +28,9 @@ public class Ship {
 	public final int id;
 	int supe;
 	
+	int lastdx;
+	int lastdy;
+	
 	ArrayList<Integer> state = new ArrayList<Integer>();
 	
 	public Ship(Color spl, int sx, int sy, boolean de, int nid, int wid) {// create virtual
@@ -38,6 +41,7 @@ public class Ship {
 		RANGE = 30;
 		width = wid;
 		half = wid/2;
+		SPEED = 10;
 	}
 	public Ship(Color spl, int sx, int sy, int hp, int spd, int rng, int dmg, int attackcd, int wid, int sup) {// actually create
 		supe = sup;
@@ -62,21 +66,44 @@ public class Ship {
 		state.add(width);
 		state.add(0);	//alive
 	}
+	/**
+	 * used solely in main menu for cool animations
+	 */
+	public boolean moveToTarget() {
+		if(tar == null)
+			return false;
+		cur = new Point(cur.x+dx, cur.y+dy);
+		if(Math.abs(cur.x-tar.x)<SPEED) {
+			dx = 0;
+		}
+		if(Math.abs(cur.y-tar.y)<SPEED) {
+			dy = 0;
+		}
+		if(dx == 0 && dy == 0) {
+			return true;
+		}
+		return false;
+	}
 	public void setD(int x, int y) {
 		dx = x;
 		dy = y;
 	}
+//	public void 
 	public void tic() {
 		if(dead) {
 			world.removeShip(this);
 			return;
 		}
-		if(!world.collides(new Rectangle(cur.x+dx-half, cur.y-half, width, width), this)) {
-			cur = new Point(cur.x+dx, cur.y);
-		}
-		if(!world.collides(new Rectangle(cur.x-half, cur.y+dy-half, width, width), this)) {
-			cur = new Point(cur.x, cur.y+dy);
-		}
+//		if(!world.collides(new Rectangle(cur.x+dx-half, cur.y+dy-half, width, width), this)) {
+//			cur = new Point(cur.x+dx, cur.y+dy);
+//		} else {
+			if(!world.collides(new Rectangle(cur.x+dx-half, cur.y-half, width, width), this)) {//very inefficient collision checking
+				cur = new Point(cur.x+dx, cur.y);
+			}
+			if(!world.collides(new Rectangle(cur.x-half, cur.y+dy-half, width, width), this)) {// (#ships)^2 checks per tic of world
+				cur = new Point(cur.x, cur.y+dy);
+			}
+//		}
 		if(this.collides(world.met)) {
 			world.met.collidedwith(this);
 		}
@@ -139,12 +166,15 @@ public class Ship {
 			dy = (int) ((tar.y-cur.y)*ratio);
 		}
 	}
-	public void draw(Graphics2D g) {
+	public void draw(Graphics2D g, Point focus) {
 		if(dead)
 			g.setColor(Color.white);
 		else
 			g.setColor(player);
-		g.fillRect(cur.x-width/2, cur.y-width/2, width, width);
+		if(supe==2)
+			g.fillRect(cur.x-width/2, cur.y-width/2, width, width);
+		else
+			g.fillOval(cur.x-width/2-focus.x, cur.y-width/2-focus.y, width, width);
 	}
 	public boolean collides(Rectangle r) {
 		if(r.intersects(new Rectangle(cur.x-half-1, cur.y-half-1, width+2, width+2))) {

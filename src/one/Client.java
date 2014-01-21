@@ -8,6 +8,8 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+
+import one.BetterFrame.GameFrame;
 /*
 	false 0
 	true 1
@@ -16,17 +18,6 @@ import java.util.ArrayList;
 	tar2 2
 	end 3
 	
-	Base 10001
-	Ship 10002
-	Laser 10003
-	Stat 10004
-	Init 10005
-	Meteor 10006
-	removeship 10007
-	wall 10008
-	Pause 10009
-	Ping 10010
-	Game Unavailable 10012
 */
 public class Client implements Runnable{
 	public static final int FALSE=0;
@@ -40,17 +31,20 @@ public class Client implements Runnable{
 	public static final int REMOVESHIP=10007;
 	public static final int WALL=10008;
 	public static final int PAUSE=10009;
+	public static final int PING=10010;
 	public static final int REMOVEBASE=10011;
 	public static final int GAMEUNAVAILABLE=10012;
+	public static final int WORLDSIZE=10013;
+	public static final int BASEATTACKED=10014;
 	
 	Socket socket;
-	Frame frame;
+	GameFrame frame;
 	DataInputStream hostin;
 	DataOutputStream hostout;
 	String ip;
 	Thread mythread;
 	boolean stop = false;
-	public Client(Frame f, String ip) {
+	public Client(GameFrame f, String ip) {
 		frame = f;
 		this.ip = ip;
 	    this.mythread = new Thread(this);
@@ -59,21 +53,30 @@ public class Client implements Runnable{
 		mythread.start();
 	}
 	public void stop() {
+		stop = true;
 		ArrayList<Integer> i  = new ArrayList<Integer>();
 		i.add(10003);
 		i.add(frame.me.getRed());
 		i.add(frame.me.getGreen());
 		i.add(frame.me.getBlue());
 		send(i);
-		stop = true;
 	}
 	public void read() {
 		while(!stop) {
 			try {
-				int type = hostin.readInt();
+				int type = 0;
+				while(type<10000) {
+					type = hostin.readInt();
+				}
 				if(type==Client.WALL)
 					frame.walls = new ArrayList<Wall>();
 				int num = hostin.readInt();
+//				if(num!=1) {
+//					System.out.println(num);
+//					for(int a=0; a<10; a++) {
+//						System.out.println(hostin.readInt());
+//					}
+//				}
 				for(int a=0; a<num; a++) {
 					if(type==Client.BASE) { //reading base
 						int red = hostin.readInt();
@@ -171,32 +174,33 @@ public class Client implements Runnable{
 							frame.upregen.cost = hostin.readInt();
 							frame.upsuper.cost = hostin.readInt();
 						} else {
-							int troll = hostin.readInt();
-							troll = hostin.readInt();
-							troll = hostin.readInt();
-							troll = hostin.readInt();
-							troll = hostin.readInt();
-							troll = hostin.readInt();
-							troll = hostin.readInt();
-							troll = hostin.readInt();
-							troll = hostin.readInt();
-							troll = hostin.readInt();
-							troll = hostin.readInt();
-							troll = hostin.readInt();
-							troll = hostin.readInt();
-							troll = hostin.readInt();
-							troll = hostin.readInt();
-							troll = hostin.readInt();
-							troll = hostin.readInt();
-							troll = hostin.readInt();
-							troll = hostin.readInt();
-							troll = hostin.readInt();
+//							int troll = hostin.readInt();
+//							troll = hostin.readInt();
+//							troll = hostin.readInt();
+//							troll = hostin.readInt();
+//							troll = hostin.readInt();
+//							troll = hostin.readInt();
+//							troll = hostin.readInt();
+//							troll = hostin.readInt();
+//							troll = hostin.readInt();
+//							troll = hostin.readInt();
+//							troll = hostin.readInt();
+//							troll = hostin.readInt();
+//							troll = hostin.readInt();
+//							troll = hostin.readInt();
+//							troll = hostin.readInt();
+//							troll = hostin.readInt();
+//							troll = hostin.readInt();
+//							troll = hostin.readInt();
+//							troll = hostin.readInt();
+//							troll = hostin.readInt();
 						}
 					} else if(type==Client.INIT) {// init
 						int red = hostin.readInt();
 						int gre = hostin.readInt();
 						int blu = hostin.readInt();
 						frame.me = new Color(red, gre, blu);
+						frame.inverse = new Color(255-red, 255-gre, 255-blu);
 						frame.setTitle("Space Player "+frame.me);
 						frame.message = "Waiting for server to start game";
 					} else if(type==Client.METEOR) {// meteor
@@ -226,8 +230,6 @@ public class Client implements Runnable{
 							frame.pause(true);
 						} else if(p==0)
 							frame.pause(false);
-//					} else if(type==10010) {// ping
-//						frame.pinged();
 					} else if(type==Client.REMOVEBASE) {// removebase
 						int red = hostin.readInt();
 						int gre = hostin.readInt();
@@ -242,6 +244,21 @@ public class Client implements Runnable{
 						frame.removeBase(id);
 					} else if(type==Client.GAMEUNAVAILABLE) {// game unavailable
 						frame.message="Game unavailable (either started or full)";
+					} else if(type==Client.WORLDSIZE) {
+						int width = hostin.readInt();
+						int height = hostin.readInt();
+						int sup = hostin.readInt();
+						boolean superenabled = true;
+						if(sup==Client.FALSE) {
+							superenabled = false;
+						}
+						frame.setWorldSize(width, height);
+						frame.setsuperenabled(superenabled);
+					} else if(type == Client.PING) {
+						int ping = (int) (System.currentTimeMillis()-this.frame.timepinged);
+						frame.pinged(ping);
+					} else if(type == Client.BASEATTACKED) {
+						frame.baseattacked();
 					}
 				}
 			} catch (IOException e) {
@@ -268,8 +285,10 @@ public class Client implements Runnable{
 	}
 	public void send(ArrayList<Integer> i) {
 		try {
-			for(Integer in : i) {
-				hostout.writeInt(in);
+			if(hostout!=null) {
+				for(Integer in : i) {
+					hostout.writeInt(in);
+				}
 			}
 		} catch (IOException e) {
 			frame.message="ERROR SENDING";
@@ -289,8 +308,10 @@ public class Client implements Runnable{
 			hostin = new DataInputStream(socket.getInputStream());
 			hostout = new DataOutputStream(socket.getOutputStream());
 		} catch (UnknownHostException e) {
+			frame.message = e.toString();
 			e.printStackTrace();
 		} catch (IOException e) {
+			frame.message = e.toString();
 			e.printStackTrace();
 		}
 		read();

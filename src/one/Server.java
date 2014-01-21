@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Server implements Runnable{
+public class Server implements Runnable {
 	public ServerSocket server;
 	public World world;
 	Socket sock;
@@ -26,7 +26,7 @@ public class Server implements Runnable{
 			System.out.println("Creating Server");
 			server = new ServerSocket(34555);
 			while(true) {
-				System.out.println("Accepting socket");
+				System.out.println("waiting for connection");
 				sock = server.accept();
 				System.out.println("making reader");
 				DataInputStream hostin = new DataInputStream(sock.getInputStream());

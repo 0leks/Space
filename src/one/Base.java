@@ -13,6 +13,7 @@ import javax.swing.ImageIcon;
 public class Base {
 	public static World world;
 	public static Image heart;
+	public static Image base;
 	public final int id;
 	public static int COUNTER;
 	public Point cur;
@@ -40,6 +41,8 @@ public class Base {
 		if(heart==null) {
 			ImageIcon ii = new ImageIcon("images/heart.png");
 			heart = ii.getImage();
+			ii = new ImageIcon("images/base.png");
+			base = ii.getImage();
 		}
 		player = pla;
 		cur = new Point(x, y);
@@ -64,6 +67,8 @@ public class Base {
 		if(heart==null) {
 			ImageIcon ii = new ImageIcon("images/heart.png");
 			heart = ii.getImage();
+			ii = new ImageIcon("images/base.png");
+			base = ii.getImage();
 		}
 		player = pla;
 		cur = new Point(x, y);
@@ -159,15 +164,18 @@ public class Base {
 		}
 		return null;
 	}
-	public void draw(Graphics2D g) {
+	public void draw(Graphics2D g, Point focus) {
+		int drawx = cur.x-focus.x-width/2;
+		int drawy = cur.y-focus.y-width/2;
 		g.setColor(player);
-		g.fillRect(cur.x-width/2, cur.y-width/2, width, width);
+		g.fillRect(drawx, drawy, width, width);
 		g.setFont(new Font("Arial", Font.PLAIN, 14));
 		g.setColor(Color.white);
-		g.drawImage(heart, cur.x-width/2+1, cur.y-2, 10, 10, null);
-		g.drawString(health+"", cur.x-width/2+8, cur.y+7);
+		g.drawImage(heart, drawx+1, cur.y-focus.y-2, 10, 10, null);
+		g.drawImage(base, drawx, drawy, width, width, null);
+		g.drawString(health+"", drawx+8, cur.y-focus.y+7);
 		g.setFont(new Font("Arial", Font.PLAIN, 10));
-		g.drawString(totalworth+"", cur.x-width/2, cur.y+20);
+		g.drawString(totalworth+"", drawx, cur.y-focus.y+20);
 	}
 	public boolean collides(Rectangle r) {
 		if(r.intersects(new Rectangle(cur.x-width/2-1, cur.y-width/2-1, width+2, width+2))) {
@@ -291,7 +299,7 @@ public class Base {
 		return (CHANCESUPER-3)/3;
 	}
 	public void upsuper() {
-		if(points>=supercost()) {
+		if(world.superenabled && points>=supercost()) {
 			points-=supercost();
 			CHANCESUPER+=5;
 //			width++;

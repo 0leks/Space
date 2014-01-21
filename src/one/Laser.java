@@ -57,12 +57,12 @@ public class Laser {
 		state.add(0);
 		state.add(0);
 	}
-	public void draw(Graphics2D g) {
+	public void draw(Graphics2D g, Point focus) {
 		g.setColor(player);
 		if(tar1!=null)
-			g.drawLine(cur.x, cur.y, tar1.cur.x, tar1.cur.y);
+			g.drawLine(cur.x-focus.x, cur.y-focus.y, tar1.cur.x-focus.x, tar1.cur.y-focus.y);
 		if(tar2!=null)
-			g.drawLine(cur.x, cur.y, tar2.cur.x, tar2.cur.y);
+			g.drawLine(cur.x-focus.x, cur.y-focus.y, tar2.cur.x-focus.x, tar2.cur.y-focus.y);
 	}
 	public int tarx() {
 		if(tar1!=null)
@@ -94,6 +94,7 @@ public class Laser {
 					hit = true;
 				}
 				if(tar2!=null) {
+					world.baseAttacked(tar2);
 					if(tar2.damage(damage)) {
 						world.gotbasekill(player);
 					}
