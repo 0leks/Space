@@ -742,20 +742,6 @@ public class World implements ActionListener {
 					pause.setText("Pause");
 					console.setTitle("Space Console  (Game Started)");
 				}
-				ArrayList<Integer> ships, bases, meteors, walls;
-				ships = convertships();
-				bases = convertbases();
-				meteors = convertMeteor();
-				walls = convertwalls();
-				System.out.println("SAVING");
-				connections.get(0).save = true;
-				connections.get(0).send(ships);
-				connections.get(0).send(bases);
-				sendStats(connections.get(0));
-				connections.get(0).send(meteors);
-				connections.get(0).send(walls);
-				connections.get(0).save = false;
-				connections.get(0).out2.close();
 				pause();	
 			}
 			if(e.getSource()==random) {

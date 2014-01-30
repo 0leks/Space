@@ -28,7 +28,7 @@ import java.util.ArrayList;
 public class Connection implements Runnable{
 	DataInputStream in;
 	DataOutputStream out;
-	PrintWriter out2;
+//	PrintWriter out2;
 	World world;
 	Thread thread;
 	int life = 10;
@@ -41,19 +41,9 @@ public class Connection implements Runnable{
 	public static final int MAKEWALL = 10004;
 	ArrayList<Integer> sendping;
 	public static int name = 0;
-	public boolean save = false;
 	public Connection(World w, DataInputStream i, DataOutputStream o) {
 		in = i;
 		out = o;
-		try {
-			out2 = new PrintWriter(new BufferedWriter(new FileWriter((name++) + "out.txt")));
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		world = w;
 		sendping = new ArrayList<Integer>();
 		sendping.add(Client.PING);
@@ -76,10 +66,7 @@ public class Connection implements Runnable{
 			return;
 		try {
 			for(Integer in : i) {
-//				System.out.println(in);
 				out.writeInt(in);
-				if(save)
-					out2.print(in);
 			}
 		}catch (IOException e) {
 			e.printStackTrace();
@@ -89,12 +76,10 @@ public class Connection implements Runnable{
 				try {
 					in.close();
 					out.close();
-					out2.close();
 					in = null;
 					out = null;
 					return;
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			}
@@ -108,7 +93,6 @@ public class Connection implements Runnable{
 				while(type<10000)
 					type = in.readInt();
 				wait = false;
-//				System.out.println("found something to read");
 				int red = in.readInt();
 				int gre = in.readInt();
 				int blu = in.readInt();
@@ -164,7 +148,6 @@ public class Connection implements Runnable{
 							out = null;
 							return;
 						} catch (IOException e1) {
-							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
 					}
