@@ -42,6 +42,7 @@ public class World implements ActionListener {
 	boolean gamestarted = false;
 	boolean superenabled = true;
 	boolean meteorenabled = true;
+  boolean pitypoints = true;
 	int timeformeteor = 0;
 	final int METEORCD = 200;
 	Server server;
@@ -119,7 +120,7 @@ public class World implements ActionListener {
 		WORLDY = y;
 	}
 	/**
-	 * sends current worldsize and duperenabled to all clients
+	 * sends current worldsize and superenabled to all clients
 	 */
 	public void updateWorld() {
 		WORLDINIT.set(2, WORLDX);
@@ -171,7 +172,7 @@ public class World implements ActionListener {
 	}
 	public boolean isColorGood(Color c) {
 		int total = c.getBlue()+c.getRed()+c.getGreen();
-		if(total<75 || total>690)
+		if(total<100 || total>690)
 			return false;
 		int MIN = 150;
 		for(Base b : bases) {
@@ -351,7 +352,7 @@ public class World implements ActionListener {
 	}
 	public void tic() {
 		if(gamestarted && !gamepaused) {
-			if(cdtogivemoney++>5) {
+			if(pitypoints && cdtogivemoney++>5) {
 				Base least = bases.get(0);
 				for(int a=1; a<bases.size(); a++) {
 					if(bases.get(a).totalworth<least.totalworth) {
@@ -448,7 +449,7 @@ public class World implements ActionListener {
 	}
 	public Ship getinrange(Base ship) {
 		for(Ship s : ships) {
-			if(!ship.player.equals(s.player) && s.distance(ship)<ship.RANGE*3/2) {
+			if(!ship.player.equals(s.player) && s.distance(ship)<ship.RANGE*2) {
 				return s;
 			}
 		}
@@ -635,6 +636,7 @@ public class World implements ActionListener {
 		JButton supers;
 		JButton pause;
 		JButton random;
+    JButton pity;
 		public TFrame() {
 			start = new JButton("Start Game");
 			start.addActionListener(this);
@@ -661,11 +663,18 @@ public class World implements ActionListener {
 			supers.setLocation(230, 10);
 			this.add(supers);
 			random = new JButton("RandomOff");
+			random.setToolTipText("Randomly positioned spawns");
 			random.addActionListener(this);
 			random.setVisible(true);
 			random.setSize(100, 50);
 			random.setLocation(340, 10);
 			this.add(random);
+      pity = new JButton("Pity On");
+      pity.addActionListener(this);
+      pity.setVisible(true);
+      pity.setSize(100, 50);
+      pity.setLocation(450, 10);
+      this.add(pity);
 			this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			this.setTitle("Space Console");
 	    	this.setLayout(null);
@@ -701,6 +710,7 @@ public class World implements ActionListener {
 				this.remove(meteor);
 				this.remove(start);
 				this.remove(random);
+        this.remove(pity);
 				pause.setLocation(10, 10);
 				this.add(pause);
 				gamestarted = true;
@@ -751,6 +761,15 @@ public class World implements ActionListener {
 				} else {
 					random.setText("RandomOff");
 				}
+			}
+			if( e.getSource() == pity ) {
+			  pitypoints = !pitypoints;
+			  if( pitypoints) {
+			    pity.setText("Pity On");
+			  }
+			  else {
+			    pity.setText("Pity Off");
+			  }
 			}
 			this.repaint();
 		}

@@ -835,16 +835,20 @@ public class BetterFrame {
 //			}
 			
 			if(keyspressed.contains(KeyEvent.VK_DOWN) || mouse.y>=getHeight()-10) {
-				lookingat.y+=CAMERAMOVESPEED;
+			  if( lookingat.y < WORLDHEIGHT-500)
+			    lookingat.y+=CAMERAMOVESPEED;
 			}
 			if(keyspressed.contains(KeyEvent.VK_UP) || mouse.y<=10) {
-				lookingat.y-=CAMERAMOVESPEED ;
+        if( lookingat.y > -500)
+          lookingat.y-=CAMERAMOVESPEED ;
 			}
 			if(keyspressed.contains(KeyEvent.VK_RIGHT) || mouse.x>=getWidth()-10) {
-				lookingat.x+=CAMERAMOVESPEED ;
+        if( lookingat.x < WORLDWIDTH-500)
+          lookingat.x+=CAMERAMOVESPEED ;
 			}
 			if(keyspressed.contains(KeyEvent.VK_LEFT) || mouse.x<=10) {
-				lookingat.x-=CAMERAMOVESPEED ;
+        if( lookingat.x > -500)
+          lookingat.x-=CAMERAMOVESPEED ;
 			}
 			repaint();
 		}

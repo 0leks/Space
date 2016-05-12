@@ -36,6 +36,7 @@ public class Base {
 	public int MOVESPEED;
 	public int ATTACKCD;
 	public int CHANCESUPER;
+	
 	public Base(Color pla, int x, int y, int wi, int pnts) {// actually create a base
 		id = COUNTER++;
 		if(heart==null) {
