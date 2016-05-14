@@ -19,6 +19,8 @@ import java.awt.event.MouseListener;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
@@ -111,7 +113,14 @@ public class World implements ActionListener {
 		Laser.world = this;
 //		server = new Server(this);
 //		server.start();
-		console.setTitle("Space Console  (Server Created)");
+		String newTitle = "Space Console  (Server Created)";
+		try {
+		  newTitle += "ip= " + InetAddress.getLocalHost().getHostAddress();
+		} catch (UnknownHostException e1) {
+      e1.printStackTrace();
+    }
+		console.setTitle(newTitle);
+		
 		t = new Timer(50, this);
 		t.start();
 	}
@@ -839,7 +848,13 @@ public class World implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if(e.getSource()==startserver) {
-				console.setTitle("Space Console  (Server Created)");
+				String newTitle = "Space Console  (Server Created)";
+		    try {
+		      newTitle += "ip= " + InetAddress.getLocalHost().getHostAddress();
+		    } catch (UnknownHostException e1) {
+		      e1.printStackTrace();
+		    }
+		    console.setTitle(newTitle);
 				if(selected == small) {
 					setSizeOfWorld(1000, 800);
 				}
