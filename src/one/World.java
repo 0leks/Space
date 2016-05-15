@@ -361,7 +361,7 @@ public class World implements ActionListener {
 	}
 	public void tic() {
 		if(gamestarted && !gamepaused) {
-			if(pitypoints && cdtogivemoney++>5) {
+			if(pitypoints && cdtogivemoney++>15) {
 				Base least = bases.get(0);
 				for(int a=1; a<bases.size(); a++) {
 					if(bases.get(a).totalworth<least.totalworth) {

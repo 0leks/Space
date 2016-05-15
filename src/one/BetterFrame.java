@@ -233,6 +233,7 @@ public class BetterFrame {
 		public Image star;
 		public Color me;
 		public Color inverse;
+		public Base mybase;
 		boolean gamestarted = false;
 		String message = "";
 		String pingtime = "";
@@ -347,7 +348,8 @@ public class BetterFrame {
 			me = Color.gray;
 			this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			this.setUndecorated(true);
-			this.setSize(Toolkit.getDefaultToolkit().getScreenSize());
+			this.setSize(Toolkit.getDefaultToolkit().getScreenSize().width, Toolkit.getDefaultToolkit().getScreenSize().height);
+			//this.setSize(Toolkit.getDefaultToolkit().getScreenSize());
 	//		this.setTitle("Space");
 	    	this.setLayout(null);
 	    	mypanel.setLayout(null);
@@ -413,6 +415,15 @@ public class BetterFrame {
 		}
 		public void baseattacked() {
 			baseattacked = 5;
+		}
+		public boolean checkAndHandleBaseAttacked(int newHealth) {
+		  if( mybase != null) {
+  		  if( newHealth < mybase.health ) {
+  		    baseattacked();
+  		    return true;
+  		  }
+		  }
+		  return false;
 		}
 		public void send(Wall w) {
 			ArrayList<Integer> i = new ArrayList<Integer>();
@@ -481,6 +492,12 @@ public class BetterFrame {
 					
 			return new Rectangle(topleft.x, topleft.y, width, height);
 		}
+		public boolean isMyBase( Base b ) {
+		  if( b.player.equals(me) ) {
+		    return true;
+		  }
+		  return false;
+		}
 		public void readBase(Base b) {
 			for(int a=0; a<bases.size(); a++) {
 				Base base = bases.get(a);
@@ -488,13 +505,20 @@ public class BetterFrame {
 					bases.remove(a);
 				}
 			}
+      if( isMyBase(b) ) {
+        checkAndHandleBaseAttacked(b.health);
+        mybase = b;
+      }
 			bases.add(b);
 		}
 		public void removeBase(int id) {
 			for(int a=0; a<bases.size(); a++) {
 				Base base = bases.get(a);
 				if(base.id==id){
-					bases.remove(a);
+					Base removed = bases.remove(a);
+					if( isMyBase(removed) ) {
+					  mybase = null;
+					}
 				}
 			}
 		}
