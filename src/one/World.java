@@ -99,10 +99,13 @@ public class World implements ActionListener {
 		available = new ArrayList<Color>();
 		disconnected = new ArrayList<Color>();
 		available.add(Color.blue);
+    available.add(new Color(0, 220, 220)); // cyan
 		available.add(Color.red);
-		available.add(Color.green);
+		available.add(new Color(0, 240, 0)); // green
+    available.add(new Color(150, 150, 255)); // purple
+    available.add(new Color(200, 230, 100)); // yellow
 		available.add(Color.MAGENTA);
-		available.add(Color.orange);
+		available.add(new Color(255, 120, 0)); // orange
 		available.add(Color.pink);
 		available.add(Color.GRAY);
 		met = new Meteor(0, 0, 0);
@@ -181,6 +184,21 @@ public class World implements ActionListener {
 	}
 	public boolean isColorGood(Color c) {
 		int total = c.getBlue()+c.getRed()+c.getGreen();
+		int bl = c.getBlue();
+		int re = c.getRed();
+		int gr = c.getGreen();
+		int numUnder100 = 0;
+		if( re < 100 ) numUnder100++;
+		if( gr < 100 ) numUnder100++;
+    if( bl < 100 ) numUnder100++;
+    if( numUnder100 == 2 ) {
+      if( total < 150 ) {
+        return false;
+      }
+    }
+		if( c.getBlue() < 110 && c.getGreen() < 110 && c.getRed() < 110 ) {
+		  return false;
+		}
 		if(total<100 || total>690)
 			return false;
 		int MIN = 150;
@@ -192,6 +210,26 @@ public class World implements ActionListener {
 		}
 		return false;
 	}
+	public Color getRandomColor() {
+	  return new Color((int)(Math.random()*175)+80, (int)(Math.random()*175)+80, (int)(Math.random()*175)+80);
+	}
+	public Color selectColor() {
+	  Color co = Color.black;
+	  if( Math.random() < .9 && available.size() > 0) {
+      for( int i = 0; i < 10; i++ ) {
+        co = available.remove((int)(Math.random() * available.size()));
+        if( isColorGood(co) ) {
+          break;
+        }
+      }
+    } 
+    if( !isColorGood(co) ) {
+      do {
+        co = getRandomColor();
+      } while(isColorGood(co));
+    }
+    return co;
+	}
 	public void addConnection(Connection connection) {
 		connections.add(connection);
 		connection.start();
@@ -200,12 +238,7 @@ public class World implements ActionListener {
 		if(disconnected.size()>0)
 			co = disconnected.remove(0);
 		else {
-//			do {
-//				co = Color.getHSBColor((float)(Math.random()), (float)(Math.random()*.5+.5), (float)(Math.random()*.5+.5));
-//			} while(colortooclose(co));
-			do {
-				co = new Color((int)(Math.random()*6.4)*40, (int)(Math.random()*6.4)*40, (int)(Math.random()*6.4)*40);
-			} while(isColorGood(co));
+		  co = selectColor();
 		}
 		Base b = this.getbase(co);
 		if(b==null) {
@@ -237,8 +270,8 @@ public class World implements ActionListener {
 				}
 				if(con==4) {
 					b = new Base(co, WORLDX/2-20, 60, 40, startingpoints);
-					walls.add(new Wall(600, 0, 10, 150));
-					walls.add(new Wall(350, 0, 10, 150));
+//					walls.add(new Wall(600, 0, 10, 150));
+//					walls.add(new Wall(350, 0, 10, 150));
 				}
 				if(con==5) {
 					b = new Base(co, 60, WORLDY/2-20, 40, startingpoints);
@@ -361,7 +394,7 @@ public class World implements ActionListener {
 	}
 	public void tic() {
 		if(gamestarted && !gamepaused) {
-			if(pitypoints && cdtogivemoney++>15) {
+			if(pitypoints && cdtogivemoney++>15 && bases.size() > 0 ) {
 				Base least = bases.get(0);
 				for(int a=1; a<bases.size(); a++) {
 					if(bases.get(a).totalworth<least.totalworth) {
@@ -724,6 +757,8 @@ public class World implements ActionListener {
 				this.add(pause);
 				gamestarted = true;
 				console.setTitle("Space Console  (Game Started)");
+        walls.add(new Wall(WORLDX/2 - WORLDX/14, WORLDY/2 - 10, WORLDX/7, 20));
+        walls.add(new Wall(WORLDX/2 - 10, WORLDY/2 - WORLDY/14, 20, WORLDY/7));
 //				WORLDSIZE.set(2, WORLDX);
 //				WORLDSIZE.set(3, WORLDY);
 //				for(int a=connections.size()-1; a>=0; a--) {

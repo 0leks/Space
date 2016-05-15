@@ -80,7 +80,7 @@ public class Connection implements Runnable{
 					out = null;
 					return;
 				} catch (IOException e1) {
-					e1.printStackTrace();
+				  System.err.println( "Error Sending Data, Most Likely due to Client disconnect" );
 				}
 			}
 		}
