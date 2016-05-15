@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -41,6 +42,7 @@ public class Client implements Runnable{
 	GameFrame frame;
 	DataInputStream hostin;
 	DataOutputStream hostout;
+	ObjectInputStream input;
 	String ip;
 	Thread mythread;
 	boolean stop = false;
@@ -60,6 +62,135 @@ public class Client implements Runnable{
 		i.add(frame.me.getGreen());
 		i.add(frame.me.getBlue());
 		send(i);
+	}
+	public void readObjects() {
+	  while(!stop) {
+	    try {
+        Object object = input.readUnshared();
+//        System.out.print("\nRead Object!");
+        if( object != null ) {
+//          System.out.print(" Not Null!");
+          if( object instanceof Object[] ) {
+//            System.out.print(" is Object[]!");
+            Object[] objects = (Object[]) object;
+//            System.out.print(" length=" + objects.length + "!");
+            for( int index = 0; index < objects.length; index++ ) {
+              Object obj = objects[index];
+              if( obj instanceof Ship) {
+                Ship ship = (Ship) obj;
+                if(ship.removeThis) {
+                  frame.removeShip(ship.id);
+                }
+                else {
+                  frame.startgame();
+                  Ship newship = new Ship(ship);
+                  frame.readShip(newship);
+                }
+//                if( ship.id == 10 ) {
+//                  System.out.println("Read ship id:" + ship.id + " x,y: " + ship.cur.x + "," + ship.cur.y);
+//                }
+              }
+              else if( obj instanceof Base ) {
+                Base base = (Base) obj;
+                Base b = new Base(base);
+                b.health = base.health;
+                frame.readBase(b);
+                int red = base.player.getRed();
+                int gre = base.player.getGreen();
+                int blu = base.player.getBlue();
+                Color c = new Color( red, gre, blu);
+                if(c.equals(frame.me)) {
+                  frame.updamage.stat = base.DAMAGE;
+                  frame.upspeed.stat = base.MOVESPEED;
+                  frame.uprange.stat = base.RANGE;
+                  frame.upbuildcd.stat = base.BUILDCD;
+                  frame.upmaxships.stat = base.MAXSHIPS;
+                  frame.uphealth.stat = base.HEALTH;
+                  frame.upattackcd.stat = base.ATTACKCD;
+                  frame.upregen.stat = base.REGEN;
+                  frame.upsuper.stat = base.CHANCESUPER;
+                  frame.points = base.points;
+                  frame.updamage.cost = base.damagecost();
+                  frame.upspeed.cost = base.speedcost();
+                  frame.uprange.cost = base.rangecost();
+                  frame.upbuildcd.cost = base.buildcdcost();
+                  frame.upmaxships.cost = base.shipscost();
+                  frame.uphealth.cost = base.healthcost();
+                  frame.upattackcd.cost = base.attackcost();
+                  frame.upregen.cost = base.regencost();
+                  frame.upsuper.cost = base.supercost();
+                }
+              }
+              else if( obj instanceof Laser ) {
+                Laser laserFromStream = (Laser) obj;
+                int red = laserFromStream.player.getRed();
+                int gre = laserFromStream.player.getGreen();
+                int blu = laserFromStream.player.getBlue();
+                int x = laserFromStream.cur.x;
+                int y = laserFromStream.cur.y;
+                int damage = laserFromStream.damage;
+                int time = laserFromStream.timetohit;
+                boolean hit = laserFromStream.hit;
+                int tar = laserFromStream.getTypeOfTarget();
+                Laser laser = null;
+                if(tar==1) {
+                  int id = laserFromStream.getIDShipTarget();
+                  for(Ship sh : frame.ships) {
+                    if(sh.equals(id)) {
+                      laser = new Laser(x, y, sh, damage, new Color(red, gre, blu), time, true);
+                      laser.hit = hit;
+                    }
+                  }
+                } else if(tar==2) {
+                  int ax = laserFromStream.tar2.cur.x;
+                  int ay = laserFromStream.tar2.cur.y;
+                  for(Base b : frame.bases) {
+                    if(b.equals(ax, ay)) {
+                      laser = new Laser(x, y, b, damage, new Color(red, gre, blu), time, true);
+                      laser.hit = hit;
+                    }
+                  }
+                }
+                if(laser!=null) {
+                  frame.lasers.add(laser);
+                }
+              }
+              else if( obj instanceof Meteor ) {
+                Meteor meteor = (Meteor) obj;
+                frame.met = new Meteor(meteor);
+              }
+              else if( obj instanceof Wall ) {
+                Wall wall = (Wall) obj;
+                frame.walls.add(new Wall(wall));
+              }
+            }
+          }
+          else if( object instanceof Color ) {
+            Color color = (Color) object;
+            int red = color.getRed();
+            int gre = color.getGreen();
+            int blu = color.getBlue();
+            frame.me = new Color(red, gre, blu);
+            frame.inverse = new Color(255-red, 255-gre, 255-blu);
+            frame.setTitle("Space Player "+frame.me);
+            frame.message = "Waiting for server to start game";
+          }
+          else if( object instanceof WorldInfo ) {
+            WorldInfo wi = (WorldInfo) object;
+            int width = wi.width;
+            int height = wi.height;
+            boolean superenabled = wi.superenabled;
+            frame.setWorldSize(width, height);
+            frame.setsuperenabled(superenabled);
+            frame.pause(wi.paused);
+          }
+        }
+      } catch (ClassNotFoundException | IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+	    
+	  }
 	}
 	public void read() {
 		while(!stop) {
@@ -277,6 +408,7 @@ public class Client implements Runnable{
 	public void send(int in) {
 		try {
 			hostout.writeInt(in);
+			System.out.println("Sending");
 		} catch (IOException e) {
 			frame.message="ERROR SENDING";
 			e.printStackTrace();
@@ -305,7 +437,8 @@ public class Client implements Runnable{
 				return;
 			}
 			socket = new Socket(hostIP, 34555);
-			hostin = new DataInputStream(socket.getInputStream());
+			//hostin = new DataInputStream(socket.getInputStream());
+      input = new ObjectInputStream(socket.getInputStream());
 			hostout = new DataOutputStream(socket.getOutputStream());
 		} catch (UnknownHostException e) {
 			frame.message = e.toString();
@@ -314,6 +447,22 @@ public class Client implements Runnable{
 			frame.message = e.toString();
 			e.printStackTrace();
 		}
-		read();
+		Thread thread = new Thread() {
+		  @Override
+		  public void run() {
+		    readObjects();
+		  }
+		};
+		//thread.start();
+
+    int red = 240;
+    int gre = 120;
+    int blu = 0;
+    frame.me = new Color(red, gre, blu);
+    frame.inverse = new Color(255-red, 255-gre, 255-blu);
+    frame.setTitle("Space Player "+frame.me);
+    frame.message = "Waiting for server to start game";
+		readObjects();
+		//read();
 	}
 }

@@ -3,15 +3,21 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 
-public class Ship {
-	public static int COUNTER;
-	public static World world;
+public class Ship implements Serializable {
+  public transient static long collisionTime;
+  public transient static int collisionCalls;
+  
+  
+  public transient static boolean DRAWASCIRCLE = false;
+	public transient static int COUNTER;
+	public transient static World world;
 	public Color player;
-	public static final int WIDTH = 10;
-	public static final int HALF = 5;
+	public transient static final int WIDTH = 10;
+	public transient static final int HALF = 5;
 	public Point cur;
 	private Point tar;
 	private int dx;
@@ -19,19 +25,27 @@ public class Ship {
 	public int width;
 	public int half;
 	public boolean dead;
+  public boolean removeThis;
 	public int shoot;
 	public int SPEED;
 	public int HEALTH;
 	public int RANGE;
 	public int DAMAGE;
 	public int ATTACKCD;
-	public final int id;
+	public int id;
 	int supe;
 	
 	int lastdx;
 	int lastdy;
 	
-	ArrayList<Integer> state = new ArrayList<Integer>();
+	transient ArrayList<Integer> state = new ArrayList<Integer>();
+	
+	public Ship() {
+	  
+	}
+	public Ship(Ship other) { // create virtual copy of other ship
+	  this(other.player, other.cur.x, other.cur.y, other.dead, other.id, other.width);
+	}
 	
 	public Ship(Color spl, int sx, int sy, boolean de, int nid, int wid) {// create virtual
 		id=nid;
@@ -54,6 +68,7 @@ public class Ship {
 		HEALTH = hp;
 		DAMAGE = dmg;
 		dead = false;
+		removeThis = false;
 		width = wid;
 		half = wid/2;
 		
@@ -103,6 +118,8 @@ public class Ship {
 			if(!world.collides(new Rectangle(cur.x-half, cur.y+dy-half, width, width), this)) {// (#ships)^2 checks per tic of world
 				cur = new Point(cur.x, cur.y+dy);
 			}
+      Ship.collisionCalls += 2;
+			
 //		}
 		if(this.collides(world.met)) {
 			world.met.collidedwith(this);
@@ -173,8 +190,19 @@ public class Ship {
 			g.setColor(player);
 		if(supe==2)
 			g.fillRect(cur.x-width/2, cur.y-width/2, width, width);
-		else
-			g.fillOval(cur.x-width/2-focus.x, cur.y-width/2-focus.y, width, width);
+		else {
+		  if( Ship.DRAWASCIRCLE ) {
+		    g.fillOval(cur.x-width/2-focus.x, cur.y-width/2-focus.y, width, width);
+		  } else {
+        g.fillRect(cur.x-width/2-focus.x, cur.y-width/2-focus.y, width, width);
+		  }
+		}
+	}
+	public boolean collides(Ship other) {
+	  if( distance(other) < (this.width + other.width)/2 ) {
+	    return true;
+	  }
+	  return false;
 	}
 	public boolean collides(Rectangle r) {
 		if(r.intersects(new Rectangle(cur.x-half-1, cur.y-half-1, width+2, width+2))) {

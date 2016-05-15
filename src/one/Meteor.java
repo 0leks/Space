@@ -5,16 +5,23 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Meteor {
-	public static Image image;
+public class Meteor implements Serializable {
+	public transient static Image image;
+	public transient static int startingWidth = 60;
 	public int x, y;
 	public int dx, dy;
-	public int width = 60;
+	public int width = startingWidth;
 	public int half = 30;
-	ArrayList<Integer> state;
+	transient ArrayList<Integer> state;
 	
+	public Meteor(Meteor other ) { // virtual
+	  this.x = other.x;
+	  this.y = other.y;
+	  this.width = other.width;
+	}
 	public Meteor(int sx, int sy, int w) {// virtual
 		x = sx;
 		y = sy;

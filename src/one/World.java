@@ -33,6 +33,8 @@ public class World implements ActionListener {
 	private ArrayList<Ship> ships;
 	private ArrayList<Base> bases;
 	private ArrayList<Laser> lasers;
+//  private ArrayList<Laser> lasersToSend;
+  private ArrayList<Object> sendBuffer;
 	private ArrayList<Wall> walls;
 	private ArrayList<String> messages;
 	ArrayList<Color> available;
@@ -55,7 +57,7 @@ public class World implements ActionListener {
 	ArrayList<Integer> WORLDINIT;
 	ArrayList<Integer> baseattacked;
 	
-//	MFrame mframe;
+	MFrame mframe;
 	TFrame console;
 	BFrame options;
 	
@@ -64,6 +66,7 @@ public class World implements ActionListener {
 	final int startingpoints;
 	int cdtogivemoney;
 	public World(Server s) {
+	  sendBuffer = new ArrayList<Object>();
 		baseattacked = new ArrayList<Integer>();
 		baseattacked.add(Client.BASEATTACKED);
 		baseattacked.add(1);
@@ -76,16 +79,16 @@ public class World implements ActionListener {
 		server = s;
 		
 		options = new BFrame();
-//		mframe = new MFrame();
+		mframe = new MFrame();
 		console = new TFrame();
 		
-//		mframe.setTitle("Space Spectating Client");
+		mframe.setTitle("Space Spectating Client");
 		console.setTitle("Space Console  (Creating Server)");
 		options.setTitle("Space Server Creator");
 		
 		ImageIcon ii = new ImageIcon("resources/images/icon.png");// setting the space icon
 		Image icon = ii.getImage();
-//		mframe.setIconImage(icon);
+		mframe.setIconImage(icon);
 		console.setIconImage(icon);
 		options.setIconImage(icon);
 		
@@ -130,20 +133,25 @@ public class World implements ActionListener {
 	public void setSizeOfWorld(int x, int y) {
 		WORLDX = x;
 		WORLDY = y;
+		Meteor.startingWidth = (x+y)/36;
 	}
 	/**
 	 * sends current worldsize and superenabled to all clients
 	 */
 	public void updateWorld() {
-		WORLDINIT.set(2, WORLDX);
-		WORLDINIT.set(3, WORLDY);
-		WORLDINIT.set(4, Client.TRUE);
-		if(!superenabled) {
-			WORLDINIT.set(4, Client.FALSE);
-		}
-		for(int a=connections.size()-1; a>=0; a--) {
-			connections.get(a).send(WORLDINIT);
-		}
+	  WorldInfo wi = new WorldInfo(this.WORLDX, this.WORLDY, this.superenabled);
+    for(int a=connections.size()-1; a>=0; a--) {
+      connections.get(a).send(wi);
+    }
+//		WORLDINIT.set(2, WORLDX);
+//		WORLDINIT.set(3, WORLDY);
+//		WORLDINIT.set(4, Client.TRUE);
+//		if(!superenabled) {
+//			WORLDINIT.set(4, Client.FALSE);
+//		}
+//		for(int a=connections.size()-1; a>=0; a--) {
+//			connections.get(a).send(WORLDINIT);
+//		}
 	}
 	public boolean canJoin() {
 		if(!hasSpace())
@@ -216,7 +224,7 @@ public class World implements ActionListener {
 	public Color selectColor() {
 	  Color co = Color.black;
 	  if( Math.random() < .9 && available.size() > 0) {
-      for( int i = 0; i < 10; i++ ) {
+      for( int i = 0; i < 10 && available.size() > 0 ; i++ ) {
         co = available.remove((int)(Math.random() * available.size()));
         if( isColorGood(co) ) {
           break;
@@ -230,6 +238,7 @@ public class World implements ActionListener {
     }
     return co;
 	}
+	
 	public void addConnection(Connection connection) {
 		connections.add(connection);
 		connection.start();
@@ -383,14 +392,16 @@ public class World implements ActionListener {
 			}
 		}
 		ships.remove(s);
-		ArrayList<Integer> i = new ArrayList<Integer>();
-		i.add(Client.REMOVESHIP);
-		i.add(1);
-		i.addAll(s.convert());
-		for(int a=0; a<connections.size(); a++) {
-			Connection c = connections.get(a);
-			c.send(i);
-		}
+		s.removeThis = true;
+		sendBuffer.add(s);
+//		ArrayList<Integer> i = new ArrayList<Integer>();
+//		i.add(Client.REMOVESHIP);
+//		i.add(1);
+//		i.addAll(s.convert());
+//		for(int a=0; a<connections.size(); a++) {
+//			Connection c = connections.get(a);
+//			c.send(i);
+//		}
 	}
 	public void tic() {
 		if(gamestarted && !gamepaused) {
@@ -401,7 +412,8 @@ public class World implements ActionListener {
 						least = bases.get(a);
 					}
 				}
-				gotshipkill(least.player);
+				for( int a = 0; a < 20; a++ )
+				  gotshipkill(least.player);
 				cdtogivemoney=0;
 			}
 			for(int a=lasers.size()-1; a>=0; a--) {
@@ -414,10 +426,17 @@ public class World implements ActionListener {
 				Base b = bases.get(a);
 				b.tic();
 			}
+
+      long startTime = System.currentTimeMillis();
 			for(int a=ships.size()-1; a>=0; a--) {
 				Ship s = ships.get(a);
 				s.tic();
 			}
+      long endTime = System.currentTimeMillis();
+      Ship.collisionTime += endTime - startTime;
+      //System.err.println("Collision Calls: " + Ship.collisionCalls + "\t\tCollision Time: " + Ship.collisionTime);
+      Ship.collisionCalls = 0;
+      Ship.collisionTime = 0;
 			if(meteorenabled) {
 				if(timeformeteor++>METEORCD) {
 					if((met!=null && met.disabled()) || met==null) {
@@ -428,20 +447,50 @@ public class World implements ActionListener {
 				met.tic();
 			}
 		}
-		ArrayList<Integer> ships, bases, meteors, walls;
-		ships = convertships();
-		bases = convertbases();
-		meteors = convertMeteor();
-		walls = convertwalls();
-		
+    long startTime = System.currentTimeMillis();
+		ArrayList<Integer> bases, meteors, walls;
+		//bases = convertbases();
+//		meteors = convertMeteor();
+//		walls = convertwalls();
+		Object[] listships = this.ships.toArray();
+		Object[] listbases = this.bases.toArray();
+		Object[] listlasers = this.sendBuffer.toArray();
+		this.sendBuffer.clear();
+		Object[] listmeteors = {};
+		if( this.met != null ) {
+	    listmeteors = new Object[1];
+	    listmeteors[0] = this.met;
+		}
+		Object[] listwalls = this.walls.toArray();
+		Object[][] arrays = {listships, listbases, listlasers, listmeteors, listwalls};
+		Object[] list = combineArrays(arrays);
 		for(int a=0; a<connections.size(); a++) {
 			Connection c = connections.get(a);
-			c.send(ships);
-			c.send(bases);
-			sendStats(c);
-			c.send(meteors);
-			c.send(walls);
+			c.send(list);
+			//c.send(listbases);
+			c.reset();
+//			c.send(bases);
+//			sendStats(c);
+//			c.send(meteors);
+//			c.send(walls);
 		}
+    long endTime = System.currentTimeMillis();
+    long sendTime = endTime - startTime;
+    //System.err.println("sendTime: " + Ship.collisionTime);
+	}
+	public Object[] combineArrays( Object[][] arrays ) {
+	  int size = 0;
+	  for( int index = 0; index < arrays.length; index++ ) {
+	    size += arrays[index].length;
+	  }
+	  Object[] array = new Object[size];
+	  int index = 0;
+	  for( int i = 0; i < arrays.length; i++ ) {
+	    for( int j = 0; j < arrays[i].length; j++, index++ ) {
+	      array[index] = arrays[i][j];
+	    }
+	  }
+	  return array;
 	}
 	public void pause() {
 		ArrayList<Integer> send = new ArrayList<Integer>();
@@ -464,15 +513,18 @@ public class World implements ActionListener {
 		sendlaser(l);
 	}
 	public void sendlaser(Laser l) {
-		ArrayList<Integer> i = new ArrayList<Integer>();
-		i.add(Client.LASER);
-		i.add(1);
-		i.addAll(l.convert());
-		for(int a=0; a<connections.size(); a++) {
-			Connection c = connections.get(a);
-			c.send(i);
-		}
-	}
+	  sendBuffer.add(l);
+  }
+//	public void sendlaser(Laser l) {
+//		ArrayList<Integer> i = new ArrayList<Integer>();
+//		i.add(Client.LASER);
+//		i.add(1);
+//		i.addAll(l.convert());
+//		for(int a=0; a<connections.size(); a++) {
+//			Connection c = connections.get(a);
+//			c.send(i);
+//		}
+//	}
 	public Base getbaseinrange(Ship ship) {
 		for(Base s : bases) {
 			if(!ship.player.equals(s.player) && ship.distance(s)<ship.RANGE) {
@@ -596,7 +648,7 @@ public class World implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		tic();
-//		mframe.repaint();
+		mframe.repaint();
 	}
 	public class MFrame extends JFrame implements MouseListener{
 		Point pressed;
@@ -756,6 +808,7 @@ public class World implements ActionListener {
 				pause.setLocation(10, 10);
 				this.add(pause);
 				gamestarted = true;
+				mframe.setVisible(true);
 				console.setTitle("Space Console  (Game Started)");
         walls.add(new Wall(WORLDX/2 - WORLDX/14, WORLDY/2 - 10, WORLDX/7, 20));
         walls.add(new Wall(WORLDX/2 - 10, WORLDY/2 - WORLDY/14, 20, WORLDY/7));

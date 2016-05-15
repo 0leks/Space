@@ -4,11 +4,19 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Wall {
+public class Wall implements Serializable {
 	int x, y, w, h;
 	ArrayList<Integer> state = new ArrayList<Integer>();
+	
+	public Wall( Wall other ) {
+	  this.x = other.x;
+	  this.y = other.y;
+	  this.w = other.w;
+	  this.h = other.h;
+	}
 	public Wall(int xx, int yy, int ww, int hh) {
 		x = xx;
 		y = yy;

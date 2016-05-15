@@ -9,6 +9,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
@@ -28,6 +30,7 @@ import java.util.ArrayList;
 public class Connection implements Runnable{
 	DataInputStream in;
 	DataOutputStream out;
+	ObjectOutputStream output;
 //	PrintWriter out2;
 	World world;
 	Thread thread;
@@ -41,9 +44,10 @@ public class Connection implements Runnable{
 	public static final int MAKEWALL = 10004;
 	ArrayList<Integer> sendping;
 	public static int name = 0;
-	public Connection(World w, DataInputStream i, DataOutputStream o) {
+	public Connection(World w, DataInputStream i, DataOutputStream o, ObjectOutputStream output) {
 		in = i;
 		out = o;
+		this.output = output;
 		world = w;
 		sendping = new ArrayList<Integer>();
 		sendping.add(Client.PING);
@@ -59,9 +63,45 @@ public class Connection implements Runnable{
 		i.add(c.getRed());
 		i.add(c.getGreen());
 		i.add(c.getBlue());
-		send(i);
+		send(player);
+		//send(i);
+	}
+  public void reset() {
+    try {
+      output.reset();
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+	public void send( Object o ) {
+	  try {
+      output.writeUnshared(o);
+    } catch (IOException e) {
+      processErrorSending(e);
+    }
+	}
+	private void processErrorSending(IOException e) {
+	  e.printStackTrace();
+    if(life--<0) {
+      dc = true;
+      world.removeConnection(this);
+      try {
+        in.close();
+        out.close();
+        in = null;
+        out = null;
+        return;
+      } catch (IOException e1) {
+        System.err.println( "Error Sending Data, Most Likely due to Client disconnect" );
+      }
+    }
 	}
 	public void send(ArrayList<Integer> i) {
+	  int a = 0;
+	  if( a == 0 ) {
+	    return;
+	  }
 		if(out==null)
 			return;
 		try {
@@ -69,20 +109,7 @@ public class Connection implements Runnable{
 				out.writeInt(in);
 			}
 		}catch (IOException e) {
-			e.printStackTrace();
-			if(life--<0) {
-				dc = true;
-				world.removeConnection(this);
-				try {
-					in.close();
-					out.close();
-					in = null;
-					out = null;
-					return;
-				} catch (IOException e1) {
-				  System.err.println( "Error Sending Data, Most Likely due to Client disconnect" );
-				}
-			}
+      processErrorSending(e);
 		}
 	}
 	public void read() {
@@ -92,6 +119,7 @@ public class Connection implements Runnable{
 				int type = 0;
 				while(type<10000)
 					type = in.readInt();
+				System.out.println("Read:" + type);
 				wait = false;
 				int red = in.readInt();
 				int gre = in.readInt();

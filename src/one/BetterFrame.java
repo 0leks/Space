@@ -738,6 +738,7 @@ public class BetterFrame {
 	
 			@Override
 			public void mousePressed(MouseEvent e) {
+			  System.err.println("Pressed Mouse");
 				mousedown=true;
 				if(mousedown && buildwallmode) {
 					cornerone = e.getPoint();
@@ -834,11 +835,15 @@ public class BetterFrame {
 		}
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			for(int a=0; a<ships.size(); a++) {
-				Ship s=ships.get(a);
-				if(s.dead)
-					ships.remove(a--);
-			}
+      try {
+  			for(int a=0; a<ships.size(); a++) {
+			    Ship s=ships.get(a);
+  				if(s.dead)
+  					ships.remove(a--);
+  			}
+      } catch (IndexOutOfBoundsException i) {
+        
+      }
 //			if(tictime) {
 //				tictime=!tictime;
 				for(int a=lasers.size()-1; a>=0 && !pause; a--) {

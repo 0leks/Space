@@ -3,10 +3,11 @@ package one;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Laser {
-	public static World world;
+public class Laser implements Serializable {
+	public transient static World world;
 	Point cur;
 	Ship tar1;
 	Base tar2;
@@ -15,7 +16,7 @@ public class Laser {
 	Color player;
 	boolean spec;
 	int timetohit;
-	ArrayList<Integer> state = new ArrayList<Integer>();
+	transient ArrayList<Integer> state = new ArrayList<Integer>();
 	
 	public Laser(int x, int y, Ship s, int dmg, Color c, int time, boolean sp) {
 		spec = sp;
@@ -102,6 +103,22 @@ public class Laser {
 				}
 			}
 		}
+	}
+	public int getIDShipTarget() {
+	  if( tar1 != null ) {
+	    return tar1.getID();
+	  }
+	  return -1;
+	}
+	public int getTypeOfTarget() {
+	  if(tar1!=null) {
+      return 1;
+    }
+    
+    if(tar2!=null) {
+      return 2;
+    }
+    return 3;
 	}
 	public ArrayList<Integer> convert() {
 		state.set(3, cur.x);

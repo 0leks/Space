@@ -32,13 +32,16 @@ public class Server implements Runnable {
 				DataInputStream hostin = new DataInputStream(sock.getInputStream());
 				System.out.println("Creating outputstream");
 				DataOutputStream hostout = new DataOutputStream(sock.getOutputStream());
+				ObjectOutputStream output = new ObjectOutputStream(sock.getOutputStream());
 				if(world.canJoin()) {
-					world.addConnection(new Connection(world, hostin, hostout));
+					world.addConnection(new Connection(world, hostin, hostout, output));
 				} else {
-					hostout.writeInt(10012);
-					hostout.writeInt(1);
+//					hostout.writeInt(10012);
+//					hostout.writeInt(1);
 					hostin.close();
 					hostout.close();
+					output.close();
+					
 				}
 			}
 		} catch (IOException e) {

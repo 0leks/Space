@@ -6,16 +6,17 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 
-public class Base {
-	public static World world;
-	public static Image heart;
-	public static Image base;
+public class Base implements Serializable {
+	public transient static World world;
+	public transient static Image heart;
+	public transient static Image base;
 	public final int id;
-	public static int COUNTER;
+	public transient static int COUNTER;
 	public Point cur;
 	public Color player;
 	public boolean dead;
@@ -52,8 +53,8 @@ public class Base {
 		totalworth=points;
 		health = 1000;
 		numships = 0;
-		MAXSHIPS = 15;
-		BUILDCD = 15;
+		MAXSHIPS = 100;//15;
+		BUILDCD = 1;//15;
 		buildcd = BUILDCD;
 		RANGE = 50;
 		HEALTH = 10;
@@ -62,6 +63,9 @@ public class Base {
 		ATTACKCD = 1;
 		REGEN = 1;
 		CHANCESUPER = 10;
+	}
+	public Base( Base other ) {
+    this(new Color(other.player.getRed(), other.player.getGreen(), other.player.getBlue()), other.cur.x, other.cur.y, other.width, other.points, other.totalworth, other.id);
 	}
 	public Base(Color pla, int x, int y, int wi, int pnts, int totalworth, int sid) {// create a virtual base
 		id = sid;
@@ -177,6 +181,12 @@ public class Base {
 		g.drawString(health+"", drawx+8, cur.y-focus.y+7);
 		g.setFont(new Font("Arial", Font.PLAIN, 10));
 		g.drawString(totalworth+"", drawx, cur.y-focus.y+20);
+		if( !dead ) {
+	    g.setColor(Color.black);
+	    g.fillOval(drawx, drawy, width, width);
+	    g.setColor(player);
+	    g.fillOval(drawx+10, drawy+10, width-20, width-20);
+		}
 	}
 	public boolean collides(Rectangle r) {
 		if(r.intersects(new Rectangle(cur.x-width/2-1, cur.y-width/2-1, width+2, width+2))) {
