@@ -53,8 +53,8 @@ public class Base implements Serializable {
 		totalworth=points;
 		health = 1000;
 		numships = 0;
-		MAXSHIPS = 100;//15;
-		BUILDCD = 1;//15;
+		MAXSHIPS = 15;
+		BUILDCD = 15;
 		buildcd = BUILDCD;
 		RANGE = 50;
 		HEALTH = 10;
@@ -70,9 +70,9 @@ public class Base implements Serializable {
 	public Base(Color pla, int x, int y, int wi, int pnts, int totalworth, int sid) {// create a virtual base
 		id = sid;
 		if(heart==null) {
-			ImageIcon ii = new ImageIcon("images/heart.png");
+			ImageIcon ii = new ImageIcon("resources/images/heart.png");
 			heart = ii.getImage();
-			ii = new ImageIcon("images/base.png");
+			ii = new ImageIcon("resources/images/base.png");
 			base = ii.getImage();
 		}
 		player = pla;
@@ -181,7 +181,7 @@ public class Base implements Serializable {
 		g.drawString(health+"", drawx+8, cur.y-focus.y+7);
 		g.setFont(new Font("Arial", Font.PLAIN, 10));
 		g.drawString(totalworth+"", drawx, cur.y-focus.y+20);
-		if( !dead ) {
+		if( dead ) {
 	    g.setColor(Color.black);
 	    g.fillOval(drawx, drawy, width, width);
 	    g.setColor(player);

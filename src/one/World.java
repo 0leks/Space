@@ -412,7 +412,7 @@ public class World implements ActionListener {
 						least = bases.get(a);
 					}
 				}
-				for( int a = 0; a < 20; a++ )
+//				for( int a = 0; a < 20; a++ )
 				  gotshipkill(least.player);
 				cdtogivemoney=0;
 			}
@@ -976,8 +976,8 @@ public class World implements ActionListener {
 	}
 	public void buildWall(int x, int y, int w, int h) {
 		if(!wallcollides(new Rectangle(x, y, w, h))) {
-//			Wall newwall = new Wall(x, y, w, h);
-//			walls.add(newwall);
+			Wall newwall = new Wall(x, y, w, h);
+			walls.add(newwall);
 		}
 	}
 	public Connection getConnection(Color c) {
