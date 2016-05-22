@@ -16,6 +16,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.PrintWriter;
@@ -696,12 +697,13 @@ public class World implements ActionListener {
 	public class Panel extends JPanel {
 		@Override
 		public void paintComponent(Graphics g) {
-			Graphics2D g2d = (Graphics2D)g;
+			BufferedImage image = new BufferedImage(WORLDX, WORLDY, BufferedImage.TYPE_INT_ARGB);
+      Graphics2D g2d = (Graphics2D)image.getGraphics();
 			RenderingHints rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         	rh.put(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
         	g2d.setRenderingHints(rh);
 			g2d.setColor(Color.black);
-			g2d.fillRect(0, 0, getWidth(), getHeight());
+			g2d.fillRect(0, 0, WORLDX, WORLDY);
 			if(met!=null)
 				met.draw(g2d,lookingat);
 			for(Ship s:ships) {
@@ -722,6 +724,7 @@ public class World implements ActionListener {
 			}
 			g.setColor(Color.white);
 			g.drawRect(0-lookingat.x, 0-lookingat.y, WORLDX, WORLDY);
+			g.drawImage(image, 0, 0, mframe.getWidth(), mframe.getHeight()+25, null);
 		}
 	}
 	public class TFrame extends JFrame implements KeyListener, ActionListener{
