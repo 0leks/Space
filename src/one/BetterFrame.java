@@ -341,8 +341,8 @@ public class BetterFrame {
 			upsuper = new UpgradeButton("SUPER", UpgradeButton.SUPERCHANCE, '9');
 			upsuper.setToolTipText("% chance of building a SuperShip.");
 			initbutton(upsuper, mypanel.getWidth()-110, 620, 100, 50);
-      invisSpell = new SpellButton("INVIS", SpellButton.INVIS, 'i');
-      initbutton(invisSpell, 100, 160, 100, 50);
+      invisSpell = new SpellButton("INVISIBLE", SpellButton.INVIS, 'i');
+      initbutton(invisSpell, 30, mypanel.getHeight() - 80, 100, 50);
 			
 			for(Component c : mypanel.getComponents()) {
 				if(c instanceof SpellButton || c instanceof UpgradeButton) {
@@ -363,7 +363,7 @@ public class BetterFrame {
 			this.addMouseMotionListener(new Listener());
 			this.addKeyListener(new Listener());
 			this.validate();
-			for(int a=0; a<400; a++) {
+			for(int a=0; a<getWidth()/2; a++) {
 				stars.add(new Point((int) (Math.random()*(getWidth()*3)-getWidth()), (int)(Math.random()*(getHeight()*3)-getHeight())));
 			}
 			this.repaint();
@@ -598,7 +598,12 @@ public class BetterFrame {
 					met.draw(g2d, lookingat);
 				for(int a=0; a<ships.size(); a++) {
 					Ship s=ships.get(a);
-					s.draw(g2d, lookingat);
+					if( s.player.equals(me)) {
+					  s.drawMyShip(g2d, lookingat);
+					}
+					else {
+					  s.draw(g2d, lookingat);
+					}
 				}
 				for(int a=0; a<bases.size(); a++) {
 					Base b = bases.get(a);
@@ -699,6 +704,7 @@ public class BetterFrame {
 			return i;
 		}
 		public void draw(Graphics2D g, MyButton b) {/// draws a MyButton
+		  
 			g.setColor(me);
 			g.fillRect(b.getLocation().x, b.getLocation().y,b.getSize().width, b.getSize().height);
 			g.setColor(Color.white);
@@ -724,10 +730,20 @@ public class BetterFrame {
   			g.setFont(new Font("Arial", Font.PLAIN, 14));
   			g.drawString(""+b.hotkey, b.getLocation().x+1, b.getLocation().y+45);
 			}
-			else if( b instanceof SpellButton) {
-        g.setColor(me);
-        g.setFont(new Font("Arial", Font.BOLD, 40));
-        FontMetrics metr = this.getFontMetrics(g.getFont());
+			else if( b instanceof SpellButton && mybase != null ) {
+        g.setColor(Color.black);
+        //TODO temp jankness for now, later fix to srp dry
+        
+        double ratio = mybase.invisCooldownRatio();
+        if( ratio < .22 && ratio > 0 ) 
+          ratio = .22;
+//        System.out.println(ratio);
+        int xoffset = (int) ((1-ratio) * b.getSize().width/2);
+        int yoffset = (int) ((1-ratio) * b.getSize().height/2);
+        
+        g.fillRect(b.getLocation().x+xoffset, b.getLocation().y+yoffset,(int)(b.getSize().width*ratio)+1, (int)(b.getSize().height*ratio)+1);
+        
+        
 //        String name = b.getText();
 //        g.drawString(name, b.getLocation().x-metr.stringWidth(name), b.getLocation().y+40);
 			}

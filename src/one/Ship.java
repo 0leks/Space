@@ -26,7 +26,7 @@ public class Ship implements Serializable {
 	public int half;
 	public boolean dead;
   public boolean removeThis;
-  private boolean invisible;
+  private boolean invisible = false;
 	public int shoot;
 	public int SPEED;
 	public int HEALTH;
@@ -46,6 +46,10 @@ public class Ship implements Serializable {
 	}
 	public Ship(Ship other) { // create virtual copy of other ship
 	  this(other.player, other.cur.x, other.cur.y, other.dead, other.id, other.width);
+//	  if( other.isInvisible() ) {
+//	    System.out.println("Making virtual copy of invisible ship");
+//	  }
+	  this.setInvisible(other.isInvisible());
 	}
 	
 	public Ship(Color spl, int sx, int sy, boolean de, int nid, int wid) {// create virtual
@@ -75,7 +79,7 @@ public class Ship implements Serializable {
 		
 	}
 	public void setInvisible(boolean invis) {
-	  invisible = true;
+	  invisible = invis;
 	}
 	public boolean isInvisible() { return invisible; }
 	/**
@@ -179,11 +183,33 @@ public class Ship implements Serializable {
 			dy = (int) ((tar.y-cur.y)*ratio);
 		}
 	}
+	public void drawMyShip(Graphics2D g, Point focus) {
+    if(dead)
+      g.setColor(Color.white);
+    else {
+      g.setColor(player);
+      if( Ship.DRAWASCIRCLE ) {
+        g.fillOval(cur.x-width/2-focus.x, cur.y-width/2-focus.y, width, width);
+      } else {
+        g.fillRect(cur.x-width/2-focus.x, cur.y-width/2-focus.y, width, width);
+      }
+      if( isInvisible()) { 
+        g.setColor(Color.black);
+        if( Ship.DRAWASCIRCLE ) {
+          g.fillOval(cur.x-width/2-focus.x+2, cur.y-width/2-focus.y+2, width-4, width-4);
+        } else {
+          g.fillRect(cur.x-width/2-focus.x+2, cur.y-width/2-focus.y+2, width-4, width-4);
+        }
+        g.setColor(Color.black);
+      }
+    }
+	}
 	public void draw(Graphics2D g, Point focus) {
 		if(dead)
 			g.setColor(Color.white);
-		else if( isInvisible()) {
-		  g.setColor(Color.red);
+		else if( isInvisible() ) {
+		  g.setColor(Color.black);
+//      g.setColor(Color.red);
 		}
 		else 
 			g.setColor(player);

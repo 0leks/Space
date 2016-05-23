@@ -20,6 +20,12 @@ public class Base implements Serializable {
 	public Point cur;
 	public Color player;
 	public boolean dead;
+	
+	private boolean invisactive = false;
+	private int invistimer;
+	private int INVISDURATION;
+	private int invisCooldown;
+	private int INVISCOOLDOWN;
 	public int width;
 	public int health;
 	public int points;
@@ -56,6 +62,8 @@ public class Base implements Serializable {
 		MAXSHIPS = 15;
 		BUILDCD = 15;
 		buildcd = BUILDCD;
+    INVISDURATION = 100;
+    INVISCOOLDOWN = 1000;
 		RANGE = 50;
 		HEALTH = 10;
 		DAMAGE = 3;
@@ -66,6 +74,8 @@ public class Base implements Serializable {
 	}
 	public Base( Base other ) {
     this(new Color(other.player.getRed(), other.player.getGreen(), other.player.getBlue()), other.cur.x, other.cur.y, other.width, other.points, other.totalworth, other.id);
+    this.invisCooldown = other.invisCooldown;
+    this.INVISCOOLDOWN = other.INVISCOOLDOWN;
 	}
 	public Base(Color pla, int x, int y, int wi, int pnts, int totalworth, int sid) {// create a virtual base
 		id = sid;
@@ -95,37 +105,46 @@ public class Base implements Serializable {
 		CHANCESUPER = 10;
 	}
 	public void tic() {
-		if(regcd--<0) {
-			health+=10+REGEN;
-			if(health>1000+REGEN*100) {
-				health = 1000+REGEN*100;
-			}
-			regcd=20-REGEN;
-		}
-		if(buildcd--<0 && numships<MAXSHIPS) {
-			Ship ship = spawnShip();
-			buildcd=0;
-			if(ship!=null) {
-				buildcd = BUILDCD;
-				world.addShip(ship);
-				numships++;
-			}
-		}
-		if(shoot--<0) {
-			Ship tar = world.getinrange(this);
-			if(tar!=null) {
-				Laser l = new Laser(cur.x, cur.y, tar, DAMAGE*3, player, ATTACKCD, false);
-				world.addLaser(l);
-			} 
-			int sub = 0;
-			for(int a=13-ATTACKCD; a<13; a++) {
-				sub+=a;
-			}
-			shoot = (90-sub)*2/3;
-		}
-		if(dead) {
-			world.removeBase(this);
-		}
+
+    if(dead) {
+      world.removeBase(this);
+    } else {
+      invisCooldown--;
+  		if(regcd--<0) {
+  			health+=10+REGEN;
+  			if(health>1000+REGEN*100) {
+  				health = 1000+REGEN*100;
+  			}
+  			regcd=20-REGEN;
+  		}
+  		if(buildcd--<0 && numships<MAXSHIPS) {
+  			Ship ship = spawnShip();
+  			buildcd=0;
+  			if(ship!=null) {
+  				buildcd = BUILDCD;
+  				world.addShip(ship);
+  				numships++;
+  			}
+  		}
+  		if(shoot--<0) {
+  			Ship tar = world.getinrange(this);
+  			if(tar!=null) {
+  				Laser l = new Laser(cur.x, cur.y, tar, DAMAGE*3, player, ATTACKCD, false);
+  				world.addLaser(l);
+  			} 
+  			int sub = 0;
+  			for(int a=13-ATTACKCD; a<13; a++) {
+  				sub+=a;
+  			}
+  			shoot = (90-sub)*2/3;
+  		}
+  		if( invisactive ) {
+  		  if( --invistimer < 0 ) {
+  		    world.disableInvis(player);
+  		    invisactive = false;
+  		  }
+  		}
+    }
 	}
 	public void addpoints(int p) {
 		points+=p;
@@ -164,8 +183,10 @@ public class Base implements Serializable {
 				x = cur.x+width/2+wid*2;
 			}
 			Ship s = trytospawn(x, y, sup);
-			if(s!=null)
+			if(s!=null) {
+	      s.setInvisible(invisactive);
 				return s;
+			}
 		}
 		return null;
 	}
@@ -187,6 +208,17 @@ public class Base implements Serializable {
 	    g.setColor(player);
 	    g.fillOval(drawx+10, drawy+10, width-20, width-20);
 		}
+	}
+	public double invisCooldownRatio() {
+	  return 1.0 * invisCooldown/INVISCOOLDOWN;
+	}
+	public void activateInvis() {
+	  if( invisCooldown <= 0 ) {
+	    invisCooldown = INVISCOOLDOWN;
+  	  invisactive = true;
+  	  invistimer = INVISDURATION;
+  	  world.activateInvis(player);
+	  }
 	}
 	public boolean collides(Rectangle r) {
 		if(r.intersects(new Rectangle(cur.x-width/2-1, cur.y-width/2-1, width+2, width+2))) {

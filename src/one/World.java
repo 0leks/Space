@@ -304,6 +304,22 @@ public class World implements ActionListener {
 		connection.setPlayer(b.player);
 		updateWorld();
 	}
+	public void activateInvis(Color player) {
+	  for( Ship ship : ships ) {
+	    if( ship.player.equals(player)) {
+	      ship.setInvisible(true);
+//	      System.out.println("Ship is becoming invisible");
+	    }
+	  }
+	}
+	public void disableInvis(Color player) {
+    for( Ship ship : ships ) {
+      if( ship.player.equals(player)) {
+        ship.setInvisible(false);
+//        System.out.println("Ship is becoming visible");
+      }
+    }
+	}
 	public boolean collides(Laser l) {
 		for(Wall w : walls) {
 			Rectangle r = new Rectangle(w.x, w.y, w.w, w.h);

@@ -155,7 +155,7 @@ public class Connection implements Runnable{
 						base.upsuper();
 					if(id == SpellButton.INVIS ) {
 					  System.out.println("PRESSED the INVIS SPELL");
-					  world.playerUsedInvis(color);
+					  base.activateInvis();
 					}
 				} else if(type == Connection.DISCONNECT) {// disconnect
 					world.removeConnection(this);
