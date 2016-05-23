@@ -239,16 +239,18 @@ public class BetterFrame {
 		String pingtime = "";
 		public long timepinged;
 		
-		public MyButton updamage;
-		public MyButton upspeed;
-		public MyButton uprange;
-		public MyButton uphealth;  
-		public MyButton upattackcd;
+		public UpgradeButton updamage;
+		public UpgradeButton upspeed;
+		public UpgradeButton uprange;
+		public UpgradeButton uphealth;  
+		public UpgradeButton upattackcd;
 		
-		public MyButton upbuildcd;
-		public MyButton upmaxships;
-		public MyButton upregen;
-		public MyButton upsuper;
+		public UpgradeButton upbuildcd;
+		public UpgradeButton upmaxships;
+		public UpgradeButton upregen;
+		public UpgradeButton upsuper;
+		
+		public SpellButton invisSpell;
 		public int points;
 		Point mouse;
 		
@@ -305,50 +307,51 @@ public class BetterFrame {
 			walls = new ArrayList<Wall>();
 			buttons = new ArrayList<MyButton>();
 			mypanel = new Panel();
-	
+
+      this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      this.setUndecorated(true);
+      this.setSize(Toolkit.getDefaultToolkit().getScreenSize().width, Toolkit.getDefaultToolkit().getScreenSize().height);
+      
 			this.add(mypanel);
 			mypanel.setSize(Toolkit.getDefaultToolkit().getScreenSize());
-			updamage = new MyButton("DAMAGE", 1, '1');
+			updamage = new UpgradeButton("DAMAGE", UpgradeButton.DAMAGE, '1');
 			updamage.setToolTipText("Damage dealt per laser.");
 			initbutton(updamage, mypanel.getWidth()-110, 70, 100, 50);
-			uprange = new MyButton("RANGE", 2, '2');
+			uprange = new UpgradeButton("RANGE", UpgradeButton.RANGE, '2');
 			uprange.setToolTipText("Maximum length of a laser.");
 			initbutton(uprange, mypanel.getWidth()-110, 130, 100, 50);
-			upspeed = new MyButton("SPEED", 3, '3');
+			upspeed = new UpgradeButton("SPEED", UpgradeButton.SPEED, '3');
 			upspeed.setToolTipText("Movement speed of each ship.");
 			initbutton(upspeed, mypanel.getWidth()-110, 190, 100, 50);
-			uphealth = new MyButton("HEALTH", 4, '4');
+			uphealth = new UpgradeButton("HEALTH", UpgradeButton.HEALTH, '4');
 			uphealth.setToolTipText("Maximum health of each ship");
 			initbutton(uphealth, mypanel.getWidth()-110, 250, 100, 50);
-			upattackcd = new MyButton("ATTACKSP", 7, '5');
+			upattackcd = new UpgradeButton("ATTACKSP", UpgradeButton.ATTACKSPEED, '5');
 			upattackcd.setToolTipText("How frequently your base and ships shoot lasers. (Max 8)");
 			initbutton(upattackcd, mypanel.getWidth()-110, 310, 100, 50);
-			
-	
-			upmaxships = new MyButton("MAXSHIPS", 5, '6');
+			upmaxships = new UpgradeButton("MAXSHIPS", UpgradeButton.MAXSHIPS, '6');
 			upmaxships.setToolTipText("The total number of ships your base can support.");
 			initbutton(upmaxships, mypanel.getWidth()-110, 440, 100, 50);
-			upbuildcd = new MyButton("BUILDSP", 6, '7');
+			upbuildcd = new UpgradeButton("BUILDSP", UpgradeButton.BUILDSPEED, '7');
 			upbuildcd.setToolTipText("The time it takes to build a ship. (Min 5)");
 			initbutton(upbuildcd, mypanel.getWidth()-110, 500, 100, 50);
-			upregen = new MyButton("BASEHP", 8, '8');
+			upregen = new UpgradeButton("BASEHP", UpgradeButton.BASEHEALTH, '8');
 			upregen.setToolTipText("TotalBaseHealth= 1000 + BASEHP*100   BASEHP also increases base health regeneration.");
 			initbutton(upregen, mypanel.getWidth()-110, 560, 100, 50);
-			upsuper = new MyButton("SUPER", 9, '9');
-			upsuper.setToolTipText("% chance of building a Super.");
+			upsuper = new UpgradeButton("SUPER", UpgradeButton.SUPERCHANCE, '9');
+			upsuper.setToolTipText("% chance of building a SuperShip.");
 			initbutton(upsuper, mypanel.getWidth()-110, 620, 100, 50);
+      invisSpell = new SpellButton("INVIS", SpellButton.INVIS, 'i');
+      initbutton(invisSpell, 100, 160, 100, 50);
 			
 			for(Component c : mypanel.getComponents()) {
-				if(c instanceof MyButton) {
+				if(c instanceof SpellButton || c instanceof UpgradeButton) {
 					buttons.add((MyButton)c);
 					((MyButton)c).setFocusable(false);
 				}
 			}
 	
 			me = Color.gray;
-			this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			this.setUndecorated(true);
-			this.setSize(Toolkit.getDefaultToolkit().getScreenSize().width, Toolkit.getDefaultToolkit().getScreenSize().height);
 			//this.setSize(Toolkit.getDefaultToolkit().getScreenSize());
 	//		this.setTitle("Space");
 	    	this.setLayout(null);
@@ -654,11 +657,14 @@ public class BetterFrame {
 				g.setFont(new Font("Arial", 50, 110));
 				g.setColor(Color.white);
 				g.drawString(points+"", this.getWidth()-185, 740);
-				for(Component c : this.getComponents()) {
-					if(c instanceof MyButton) {
-						draw(g2d, (MyButton)c);
-					}
+				for( MyButton button : buttons) {
+				  draw(g2d, button);
 				}
+//				for(Component c : this.getComponents()) {
+//					if(c instanceof UpgradeButton) {
+//						draw(g2d, (UpgradeButton)c);
+//					}
+//				}
 				g.setColor(Color.white);
 				g.fillRect(getWidth()-20, 0, 21, 21);
 				g.setColor(Color.black);
@@ -705,16 +711,26 @@ public class BetterFrame {
 	//		g.setFont(new Font("Helvetica", Font.BOLD, 20));//new Font("Arial", Font.BOLD, 12));
 	//		g.setColor(me);
 	//		g.drawString(b.getActionCommand(), b.getLocation().x+12, b.getLocation().y+30);
-			g.setColor(me);
-			g.setFont(new Font("Arial", Font.BOLD, 40));
-	    	FontMetrics metr = this.getFontMetrics(g.getFont());
-			g.drawString(""+b.stat, b.getLocation().x-metr.stringWidth(""+b.stat), b.getLocation().y+40);
-			g.setColor(Color.white);
-			g.setFont(new Font("Arial", Font.BOLD, 20));
-			g.drawString(""+b.cost, b.getLocation().x-65, b.getLocation().y+35);
-			g.setColor(Color.black);
-			g.setFont(new Font("Arial", Font.PLAIN, 14));
-			g.drawString(""+b.hotkey, b.getLocation().x+1, b.getLocation().y+45);
+			if( b instanceof UpgradeButton ) {
+			  UpgradeButton button = (UpgradeButton)b;
+  			g.setColor(me);
+  			g.setFont(new Font("Arial", Font.BOLD, 40));
+  	    FontMetrics metr = this.getFontMetrics(g.getFont());
+  			g.drawString(""+button.stat, b.getLocation().x-metr.stringWidth(""+button.stat), b.getLocation().y+40);
+  			g.setColor(Color.white);
+  			g.setFont(new Font("Arial", Font.BOLD, 20));
+  			g.drawString(""+button.cost, b.getLocation().x-65, b.getLocation().y+35);
+  			g.setColor(Color.black);
+  			g.setFont(new Font("Arial", Font.PLAIN, 14));
+  			g.drawString(""+b.hotkey, b.getLocation().x+1, b.getLocation().y+45);
+			}
+			else if( b instanceof SpellButton) {
+        g.setColor(me);
+        g.setFont(new Font("Arial", Font.BOLD, 40));
+        FontMetrics metr = this.getFontMetrics(g.getFont());
+//        String name = b.getText();
+//        g.drawString(name, b.getLocation().x-metr.stringWidth(name), b.getLocation().y+40);
+			}
 		}
 		public void pinged(int time) {
 			pingtime = "ping: "+time;
@@ -801,6 +817,9 @@ public class BetterFrame {
 				for(MyButton b : buttons) {
 					if(e.getKeyChar()==b.hotkey) {
 						buttonpressed(b);
+//						if( b == invisSpell) {
+//						  System.out.println("INVIS SPELL PRESSED at client");
+//						}
 					}
 				}
 				if(e.getKeyCode()==KeyEvent.VK_SPACE) {

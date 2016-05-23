@@ -26,6 +26,7 @@ public class Ship implements Serializable {
 	public int half;
 	public boolean dead;
   public boolean removeThis;
+  private boolean invisible;
 	public int shoot;
 	public int SPEED;
 	public int HEALTH;
@@ -73,6 +74,10 @@ public class Ship implements Serializable {
 		half = wid/2;
 		
 	}
+	public void setInvisible(boolean invis) {
+	  invisible = true;
+	}
+	public boolean isInvisible() { return invisible; }
 	/**
 	 * used solely in main menu for cool animations
 	 */
@@ -177,7 +182,10 @@ public class Ship implements Serializable {
 	public void draw(Graphics2D g, Point focus) {
 		if(dead)
 			g.setColor(Color.white);
-		else
+		else if( isInvisible()) {
+		  g.setColor(Color.red);
+		}
+		else 
 			g.setColor(player);
 		if(supe==2)
 			g.fillRect(cur.x-width/2, cur.y-width/2, width, width);

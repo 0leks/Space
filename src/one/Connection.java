@@ -135,24 +135,28 @@ public class Connection implements Runnable{
 					if(base==null) {
 						return;
 					}
-					if(id==1)
+					if(id==UpgradeButton.DAMAGE)
 						base.updamage();
-					if(id==2)
+					if(id==UpgradeButton.RANGE)
 						base.uprange();
-					if(id==3)
+					if(id==UpgradeButton.SPEED)
 						base.upspeed();
-					if(id==4)
+					if(id==UpgradeButton.HEALTH)
 						base.uphealth();
-					if(id==5)
+					if(id==UpgradeButton.MAXSHIPS)
 						base.upmaxships();
-					if(id==6)
+					if(id==UpgradeButton.BUILDSPEED)
 						base.upbuildcd();
-					if(id==7)
+					if(id==UpgradeButton.ATTACKSPEED)
 						base.upattackcd();
-					if(id==8)
+					if(id==UpgradeButton.BASEHEALTH)
 						base.upregen();
-					if(id==9)
+					if(id==UpgradeButton.SUPERCHANCE)
 						base.upsuper();
+					if(id == SpellButton.INVIS ) {
+					  System.out.println("PRESSED the INVIS SPELL");
+					  world.playerUsedInvis(color);
+					}
 				} else if(type == Connection.DISCONNECT) {// disconnect
 					world.removeConnection(this);
 				} else if(type == Connection.MAKEWALL) {
