@@ -38,7 +38,7 @@ public class Ship implements Serializable {
 	int lastdx;
 	int lastdy;
 	
-	transient ArrayList<Integer> state = new ArrayList<Integer>();
+//	transient ArrayList<Integer> state = new ArrayList<Integer>();
 	
 	public Ship() {
 	  
@@ -72,14 +72,6 @@ public class Ship implements Serializable {
 		width = wid;
 		half = wid/2;
 		
-		state.add(player.getRed());
-		state.add(player.getGreen());
-		state.add(player.getBlue());
-		state.add(cur.x);
-		state.add(cur.y);
-		state.add(id);
-		state.add(width);
-		state.add(0);	//alive
 	}
 	/**
 	 * used solely in main menu for cool animations
@@ -160,7 +152,6 @@ public class Ship implements Serializable {
 		HEALTH-=dmg;
 		if(HEALTH<=0) {
 			dead = true;
-			state.set(7, 1);
 			return true;
 		}
 		return false;
@@ -218,11 +209,6 @@ public class Ship implements Serializable {
 	}
 	public int getID() {
 		return id;
-	}
-	public ArrayList<Integer> convert() {
-		state.set(3, cur.x);
-		state.set(4, cur.y);
-		return state;
 	}
 //	public String toString() {
 //		String s = player.getRed()+" "+player.getGreen()+" "+player.getBlue()+" "+cur.x+" "+cur.y+" "+id+" ";

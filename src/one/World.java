@@ -577,40 +577,6 @@ public class World implements ActionListener {
 		i.addAll(b.convertstats());
 		c.send(i);
 	}
-	public ArrayList<Integer> convertwalls() {
-		ArrayList<Integer> i = new ArrayList<Integer>();
-		i.add(Client.WALL);
-		i.add(walls.size());
-		for(Wall w : walls) {
-			i.addAll(w.convert());
-		}
-		return i;
-	}
-	public ArrayList<Integer> convertbases() {
-		ArrayList<Integer> i = new ArrayList<Integer>();
-		i.add(Client.BASE);
-		i.add(bases.size());
-		for(Base b : bases) {
-			i.addAll(b.convert());
-		}
-		return i;
-	}
-	public ArrayList<Integer> convertships() {
-		ArrayList<Integer> i = new ArrayList<Integer>();
-		i.add(Client.SHIP);
-		i.add(ships.size());
-		for(Ship s : ships) {
-			i.addAll(s.convert());
-		}
-		return i;
-	}
-	public ArrayList<Integer> convertMeteor() {
-		ArrayList<Integer> i = new ArrayList<Integer>();
-		i.add(Client.METEOR);
-		i.add(1);
-		i.addAll(met.convert());
-		return i;
-	}
 	public Base getbase(Color c) {
 		for(Base b : bases) {
 			if(b.player.equals(c))
