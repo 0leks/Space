@@ -830,8 +830,8 @@ public class BetterFrame {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if(e.getKeyCode()==KeyEvent.VK_W) {
-//					if(gamestarted)   //uncomment this to reenable walls building
-//						buildwallmode = true;
+					if(gamestarted && World.BUILD_WALL_MODE_ENABLED )   //uncomment this to reenable walls building
+						buildwallmode = true;
 				}
 				if(!keyspressed.contains(e.getKeyCode())) {
 					keyspressed.add(e.getKeyCode());

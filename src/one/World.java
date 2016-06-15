@@ -32,7 +32,9 @@ import javax.swing.Timer;
 
 public class World implements ActionListener {
   
-  boolean GIVE_LOTS_OF_MONEY_FOR_TESTING = true;
+  public static final boolean GIVE_LOTS_OF_MONEY_FOR_TESTING = false;
+  
+  public static final boolean BUILD_WALL_MODE_ENABLED = true;
   
 	private ArrayList<Ship> ships;
 	private ArrayList<Base> bases;
