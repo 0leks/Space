@@ -16,7 +16,7 @@ public class Laser implements Serializable {
 	Color player;
 	boolean spec;
 	int timetohit;
-	transient ArrayList<Integer> state = new ArrayList<Integer>();
+	private int width;
 	
 	public Laser(int x, int y, Ship s, int dmg, Color c, int time, boolean sp) {
 		spec = sp;
@@ -25,18 +25,7 @@ public class Laser implements Serializable {
 		damage = dmg;
 		player = c;
 		timetohit = time;
-		
-		state.add(player.getRed());
-		state.add(player.getGreen());
-		state.add(player.getBlue());
-		state.add(cur.x);
-		state.add(cur.y);
-		state.add(damage);
-		state.add(this.timetohit);
-		state.add(0);
-		state.add(3);
-		state.add(0);
-		state.add(0);
+		this.setWidthFromDamage(damage);
 	}
 	public Laser(int x, int y, Base b, int dmg, Color c, int time, boolean sp) {
 		spec = sp;
@@ -45,23 +34,26 @@ public class Laser implements Serializable {
 		damage = dmg;
 		player = c;
 		timetohit = time;
-		
-		state.add(player.getRed());
-		state.add(player.getGreen());
-		state.add(player.getBlue());
-		state.add(cur.x);
-		state.add(cur.y);
-		state.add(damage);
-		state.add(this.timetohit);
-		state.add(0);
-		state.add(3);
-		state.add(0);
-		state.add(0);
+    this.setWidthFromDamage(damage);
 	}
+	
+	public void setWidthFromDamage(int damage) {
+	  this.width = (int)( Math.sqrt(damage)/2 );
+	  if( this.width <= 0 ) 
+	    this.width = 1;
+	}
+	public int getWidth() { return width;	}
+	
 	public void draw(Graphics2D g, Point focus) {
 		g.setColor(player);
-		if(tar1!=null)
-			g.drawLine(cur.x-focus.x, cur.y-focus.y, tar1.cur.x-focus.x, tar1.cur.y-focus.y);
+		if(tar1!=null) {
+		  int start = -getWidth()/2;
+		  for( int i = 0; i < getWidth(); i++ ) {
+		    g.drawLine(cur.x-focus.x + start, cur.y-focus.y, tar1.cur.x-focus.x + start, tar1.cur.y-focus.y);
+        g.drawLine(cur.x-focus.x, cur.y-focus.y + start, tar1.cur.x-focus.x, tar1.cur.y-focus.y + start);
+		    start++;
+		  }
+		}
 		if(tar2!=null)
 			g.drawLine(cur.x-focus.x, cur.y-focus.y, tar2.cur.x-focus.x, tar2.cur.y-focus.y);
 	}
@@ -119,33 +111,5 @@ public class Laser implements Serializable {
       return 2;
     }
     return 3;
-	}
-	public ArrayList<Integer> convert() {
-		state.set(3, cur.x);
-		state.set(4, cur.y);
-		state.set(5, damage);
-		state.set(6, this.timetohit);
-		
-		if (hit)
-			state.set(7,1);
-		else
-			state.set(7,0);
-			
-		if(tar1!=null) {
-			state.set(8,1);
-			state.add(9,tar1.getID());
-		}
-		
-		if(tar2!=null) {
-			state.set(8,2);
-			state.set(9,tar2.cur.x);
-			state.set(10,tar2.cur.y);
-		}
-		
-		if(tar1==null && tar2==null) {
-			state.set(8,3);
-		}
-		
-		return state;
 	}
 }

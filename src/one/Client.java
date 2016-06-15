@@ -132,6 +132,7 @@ public class Client implements Runnable{
                 int time = laserFromStream.timetohit;
                 boolean hit = laserFromStream.hit;
                 int tar = laserFromStream.getTypeOfTarget();
+                int width = laserFromStream.getWidth();
                 Laser laser = null;
                 if(tar==1) {
                   int id = laserFromStream.getIDShipTarget();
@@ -193,6 +194,7 @@ public class Client implements Runnable{
 	  }
 	}
 	public void read() {
+	  /*
 		while(!stop) {
 			try {
 				int type = 0;
@@ -404,6 +406,7 @@ public class Client implements Runnable{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		*/
 	}
 	public void send(int in) {
 		try {

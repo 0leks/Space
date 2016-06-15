@@ -106,12 +106,15 @@ public class World implements ActionListener {
     available.add(new Color(0, 220, 220)); // cyan
 		available.add(Color.red);
 		available.add(new Color(0, 240, 0)); // green
-    available.add(new Color(150, 150, 255)); // purple
+    available.add(new Color(150, 150, 255)); // blueish
     available.add(new Color(200, 230, 100)); // yellow
 		available.add(Color.MAGENTA);
-		available.add(new Color(255, 120, 0)); // orange
+		available.add(new Color(240, 120, 0)); // orange
 		available.add(Color.pink);
 		available.add(Color.GRAY);
+    available.add(new Color( 150, 0, 200)); // dark purple
+    available.add(new Color( 0, 150, 0)); // dark green
+    available.add(new Color( 160, 82, 45)); // brownish
 		met = new Meteor(0, 0, 0);
 		ii = new ImageIcon("resources/images/meteor.png");
 		Meteor.image = ii.getImage();
