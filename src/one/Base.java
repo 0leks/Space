@@ -20,6 +20,7 @@ public class Base implements Serializable {
 	public Point cur;
 	public Color player;
 	public boolean dead;
+	public boolean removeThis;
 	
 	private boolean invisactive = false;
 	private int invistimer;

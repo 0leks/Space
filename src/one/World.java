@@ -31,6 +31,9 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 
 public class World implements ActionListener {
+  
+  boolean GIVE_LOTS_OF_MONEY_FOR_TESTING = true;
+  
 	private ArrayList<Ship> ships;
 	private ArrayList<Base> bases;
 	private ArrayList<Laser> lasers;
@@ -396,6 +399,9 @@ public class World implements ActionListener {
 	}
 	public void removeBase(Base b) {
 		bases.remove(b);
+		b.removeThis = true;
+		sendBuffer.add(b);
+		/*
 		ArrayList<Integer> i = new ArrayList<Integer>();
 		i.add(Client.REMOVEBASE);
 		i.add(1);
@@ -404,6 +410,7 @@ public class World implements ActionListener {
 			Connection c = connections.get(a);
 			c.send(i);
 		}
+		*/
 	}
 	public void removeShip(Ship s) {
 		for(Base b : bases) {
@@ -432,8 +439,11 @@ public class World implements ActionListener {
 						least = bases.get(a);
 					}
 				}
-//				for( int a = 0; a < 20; a++ )
-				  gotshipkill(least.player);
+				if( GIVE_LOTS_OF_MONEY_FOR_TESTING ) {
+  				for( int a = 0; a < 40; a++ )
+  				  gotshipkill(least.player);
+				}
+        gotshipkill(least.player);
 				cdtogivemoney=0;
 			}
 			for(int a=lasers.size()-1; a>=0; a--) {

@@ -260,6 +260,7 @@ public class BetterFrame {
 		public ArrayList<Laser> lasers;
 		public ArrayList<Wall> walls;
 		public ArrayList<MyButton> buttons;
+		public ArrayList<ExplosionGraphic> explosions;
 		Client client;
 		Timer t;
 		boolean pause;
@@ -306,6 +307,7 @@ public class BetterFrame {
 			lasers = new ArrayList<Laser>();
 			walls = new ArrayList<Wall>();
 			buttons = new ArrayList<MyButton>();
+      explosions = new ArrayList<ExplosionGraphic>();
 			mypanel = new Panel();
 
       this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -519,8 +521,9 @@ public class BetterFrame {
 				Base base = bases.get(a);
 				if(base.id==id){
 					Base removed = bases.remove(a);
+          explosions.add(new ExplosionGraphic(removed.cur, removed.width));
 					if( isMyBase(removed) ) {
-					  mybase = null;
+					  //mybase = null;
 					}
 				}
 			}
@@ -530,6 +533,7 @@ public class BetterFrame {
 				Ship s = ships.get(a);
 				if(s.id==id) {
 					ships.remove(s);
+					explosions.add(new ExplosionGraphic(s.cur, s.width));
 				}
 			}
 		}
@@ -609,6 +613,11 @@ public class BetterFrame {
 					Base b = bases.get(a);
 					b.draw(g2d, lookingat);
 				}
+        for( int a = 0; a < explosions.size(); a++ ) {
+          ExplosionGraphic e = explosions.get(a);
+          g.setColor(Color.orange);
+          g.fillOval(e.x-e.radius/2-lookingat.x, e.y-e.radius/2-lookingat.y, e.radius, e.radius);
+        }
 				for(int a=0; a<walls.size(); a++) {
 					Wall w = walls.get(a);
 					w.draw(g2d, lookingat);
@@ -770,7 +779,7 @@ public class BetterFrame {
 	
 			@Override
 			public void mousePressed(MouseEvent e) {
-			  System.err.println("Pressed Mouse");
+//			  System.err.println("Pressed Mouse");
 				mousedown=true;
 				if(mousedown && buildwallmode) {
 					cornerone = e.getPoint();
@@ -886,6 +895,11 @@ public class BetterFrame {
 					l.tic();
 					if(l.hit) 
 						lasers.remove(l);
+				}
+				for( int a = explosions.size() - 1; a >= 0; a-- ) {
+				  if( explosions.get(a).widen() ) {
+				    explosions.remove(a);
+				  }
 				}
 				if(baseattacked>0) {
 					drawwarning--;

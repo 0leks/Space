@@ -119,7 +119,7 @@ public class Connection implements Runnable{
 				int type = 0;
 				while(type<10000)
 					type = in.readInt();
-				System.out.println("Read:" + type);
+				//System.out.println("Read:" + type);
 				wait = false;
 				int red = in.readInt();
 				int gre = in.readInt();

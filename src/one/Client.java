@@ -93,32 +93,37 @@ public class Client implements Runnable{
               else if( obj instanceof Base ) {
                 Base base = (Base) obj;
                 Base b = new Base(base);
-                b.health = base.health;
-                frame.readBase(b);
-                int red = base.player.getRed();
-                int gre = base.player.getGreen();
-                int blu = base.player.getBlue();
-                Color c = new Color( red, gre, blu);
-                if(c.equals(frame.me)) {
-                  frame.updamage.stat = base.DAMAGE;
-                  frame.upspeed.stat = base.MOVESPEED;
-                  frame.uprange.stat = base.RANGE;
-                  frame.upbuildcd.stat = base.BUILDCD;
-                  frame.upmaxships.stat = base.MAXSHIPS;
-                  frame.uphealth.stat = base.HEALTH;
-                  frame.upattackcd.stat = base.ATTACKCD;
-                  frame.upregen.stat = base.REGEN;
-                  frame.upsuper.stat = base.CHANCESUPER;
-                  frame.points = base.points;
-                  frame.updamage.cost = base.damagecost();
-                  frame.upspeed.cost = base.speedcost();
-                  frame.uprange.cost = base.rangecost();
-                  frame.upbuildcd.cost = base.buildcdcost();
-                  frame.upmaxships.cost = base.shipscost();
-                  frame.uphealth.cost = base.healthcost();
-                  frame.upattackcd.cost = base.attackcost();
-                  frame.upregen.cost = base.regencost();
-                  frame.upsuper.cost = base.supercost();
+                if( base.removeThis ) {
+                  frame.removeBase(base.id);
+                }
+                else {
+                  b.health = base.health;
+                  frame.readBase(b);
+                  int red = base.player.getRed();
+                  int gre = base.player.getGreen();
+                  int blu = base.player.getBlue();
+                  Color c = new Color( red, gre, blu);
+                  if(c.equals(frame.me)) {
+                    frame.updamage.stat = base.DAMAGE;
+                    frame.upspeed.stat = base.MOVESPEED;
+                    frame.uprange.stat = base.RANGE;
+                    frame.upbuildcd.stat = base.BUILDCD;
+                    frame.upmaxships.stat = base.MAXSHIPS;
+                    frame.uphealth.stat = base.HEALTH;
+                    frame.upattackcd.stat = base.ATTACKCD;
+                    frame.upregen.stat = base.REGEN;
+                    frame.upsuper.stat = base.CHANCESUPER;
+                    frame.points = base.points;
+                    frame.updamage.cost = base.damagecost();
+                    frame.upspeed.cost = base.speedcost();
+                    frame.uprange.cost = base.rangecost();
+                    frame.upbuildcd.cost = base.buildcdcost();
+                    frame.upmaxships.cost = base.shipscost();
+                    frame.uphealth.cost = base.healthcost();
+                    frame.upattackcd.cost = base.attackcost();
+                    frame.upregen.cost = base.regencost();
+                    frame.upsuper.cost = base.supercost();
+                  }
                 }
               }
               else if( obj instanceof Laser ) {
