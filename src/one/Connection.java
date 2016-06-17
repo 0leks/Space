@@ -141,8 +141,9 @@ public class Connection implements Runnable{
 						base.uprange();
 					if(id==UpgradeButton.SPEED)
 						base.upspeed();
-					if(id==UpgradeButton.HEALTH)
+					if(id==UpgradeButton.HEALTH) {
 						base.uphealth();
+					}
 					if(id==UpgradeButton.MAXSHIPS)
 						base.upmaxships();
 					if(id==UpgradeButton.BUILDSPEED)

@@ -200,6 +200,7 @@ public class Base implements Serializable {
 		g.setColor(Color.white);
 		g.drawImage(heart, drawx+1, cur.y-focus.y-2, 10, 10, null);
 		g.drawImage(base, drawx, drawy, width, width, null);
+    g.setColor(Color.black);
 		g.drawString(health+"", drawx+8, cur.y-focus.y+7);
 		g.setFont(new Font("Arial", Font.PLAIN, 10));
 		g.drawString(totalworth+"", drawx, cur.y-focus.y+20);
@@ -276,13 +277,12 @@ public class Base implements Serializable {
 		if(DAMAGE<9) {
 			return DAMAGE-2;
 		} else if(DAMAGE<21) {
-			return DAMAGE/3+4;
+			return DAMAGE/2+3;
 		} else if(DAMAGE<40) {
-			return DAMAGE/5+7;
-		} else if(DAMAGE<80) {
-			return DAMAGE/10+11;
-		} else {
-			return DAMAGE/20+16;
+			return DAMAGE/4+3;
+		}
+		else {
+      return DAMAGE/4+3;
 		}
 	}
 	public void updamage() {
@@ -297,7 +297,7 @@ public class Base implements Serializable {
 	public void upspeed() {
 		if(points>=speedcost()) {
 			points-=speedcost();
-			MOVESPEED+=1;
+			MOVESPEED+=2;
 		}
 	}
 	public boolean damage(int dmg) {// not an upgrade

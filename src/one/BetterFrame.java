@@ -408,7 +408,7 @@ public class BetterFrame {
 			WORLDHEIGHT = h;
 		}
 		public void makeWall() {
-			Rectangle dim = getWallDim(cornertwo);
+			Rectangle dim = createRectangle(cornerone, cornertwo);
 			int cost = getWallCost(dim);
 			if(points>=cost && !wallcollides(new Rectangle(dim.x, dim.y, dim.width, dim.height))) {
 				Wall wally = new Wall(dim);
@@ -458,7 +458,14 @@ public class BetterFrame {
 		public int getWallCost(Rectangle r) {
 			return r.width*r.height/60;
 		}
-		public Rectangle getWallDim(Point other) {
+		public Rectangle createRectangle(Point one, Point two) {
+		  int topleftx = Math.min(one.x, two.x);
+      int toplefty = Math.min(one.y, two.y);
+      int width = Math.abs(one.x - two.x);
+      int height = Math.abs(one.y - two.y);
+      return new Rectangle(topleftx, toplefty, width, height);
+      /*
+		  other = new Point( other.x + lookingat.x, other.y + lookingat.y);
 			Point topleft = new Point(0, 0);
 			Point botright = new Point(0, 0);
 			if(cornerone.x<other.x) {
@@ -495,7 +502,8 @@ public class BetterFrame {
 			if(height<MINWALLWIDTH)
 				height = MINWALLWIDTH;
 					
-			return new Rectangle(topleft.x, topleft.y, width, height);
+			return new Rectangle(topleft.x-lookingat.x, topleft.y-lookingat.y, width, height);
+			*/
 		}
 		public boolean isMyBase( Base b ) {
 		  if( b.player.equals(me) ) {
@@ -636,13 +644,18 @@ public class BetterFrame {
 					}
 					if(cornerone!=null) {
 						g2d.setColor(Color.white);
-						Rectangle dim = getWallDim(mouse);
-						g2d.draw(dim);
+						Point mouseToWorld = new Point(mouse);
+						mouseToWorld.x += lookingat.x;
+            mouseToWorld.y += lookingat.y;
+						Rectangle dimensionsInWorld = createRectangle(cornerone, mouseToWorld);
+						Rectangle dimensionsOnScreen = new Rectangle(dimensionsInWorld.x-lookingat.x, dimensionsInWorld.y - lookingat.y, dimensionsInWorld.width, dimensionsInWorld.height);//TODO Stuff
+						//Rectangle dim = getWallDim(mouse);
+						g2d.draw(dimensionsOnScreen);
 						g2d.setColor(me);
 						g2d.setFont(new Font("Arial", Font.PLAIN, 20));
 						FontMetrics fm = g2d.getFontMetrics();
-						int cost = getWallCost(dim);
-						g2d.drawString(cost+"", dim.x+dim.width/2-fm.stringWidth(cost+"")/2, dim.y+dim.height/2+10);
+						int cost = getWallCost(dimensionsInWorld);
+						g2d.drawString(cost+"", dimensionsOnScreen.x+dimensionsOnScreen.width/2-fm.stringWidth(cost+"")/2, dimensionsOnScreen.y+dimensionsOnScreen.height/2+10);
 						
 					}
 				}
@@ -782,7 +795,8 @@ public class BetterFrame {
 //			  System.err.println("Pressed Mouse");
 				mousedown=true;
 				if(mousedown && buildwallmode) {
-					cornerone = e.getPoint();
+					//cornerone = e.getPoint();
+          cornerone = new Point( e.getX() + lookingat.x, e.getY() + lookingat.y);
 				}
 			}
 	
@@ -814,7 +828,8 @@ public class BetterFrame {
 			public void mouseDragged(MouseEvent e) {
 				mouse = e.getPoint();
 				if(mousedown && buildwallmode) {
-					cornertwo = e.getPoint();
+
+					cornertwo = new Point( e.getX() + lookingat.x, e.getY() + lookingat.y);
 				}
 			}
 			@Override

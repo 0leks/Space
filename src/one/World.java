@@ -32,9 +32,11 @@ import javax.swing.Timer;
 
 public class World implements ActionListener {
   
-  public static final boolean GIVE_LOTS_OF_MONEY_FOR_TESTING = false;
+  public static final boolean GIVE_LOTS_OF_MONEY_FOR_TESTING = true;
   
   public static final boolean BUILD_WALL_MODE_ENABLED = true;
+  
+  public static final boolean METEOR_GROWS_FAST = false;
   
 	private ArrayList<Ship> ships;
 	private ArrayList<Base> bases;
@@ -136,7 +138,7 @@ public class World implements ActionListener {
     }
 		console.setTitle(newTitle);
 		
-		t = new Timer(50, this);
+		t = new Timer(100, this);
 		t.start();
 	}
 	public void setSizeOfWorld(int x, int y) {
@@ -288,12 +290,9 @@ public class World implements ActionListener {
 				}
 				if(con==4) {
 					b = new Base(co, WORLDX/2-20, 60, 40, startingpoints);
-//					walls.add(new Wall(600, 0, 10, 150));
-//					walls.add(new Wall(350, 0, 10, 150));
 				}
 				if(con==5) {
 					b = new Base(co, 60, WORLDY/2-20, 40, startingpoints);
-	//				walls.add(new Wall(0, 200, 150, 10));
 				}
 				if(con==6) {
 					b = new Base(co, WORLDX-100, WORLDY/2-20, 40, startingpoints);
@@ -305,6 +304,12 @@ public class World implements ActionListener {
 					return;
 				}
 			}
+      walls.add(new Wall(WORLDX/3-20, 0, 20, WORLDY/5));
+      walls.add(new Wall(WORLDX*2/3, 0, 20, WORLDY/5));
+      walls.add(new Wall(0, WORLDY/3, WORLDX/5, 20));
+      walls.add(new Wall(0, WORLDY*2/3-20, WORLDX/5, 20));
+      walls.add(new Wall(WORLDX-WORLDX/5, WORLDY/3, WORLDX/5, 20));
+      walls.add(new Wall(WORLDX-WORLDX/5, WORLDY*2/3-20, WORLDX/5, 20));
 			bases.add(b);
 			con++;
 //			}
@@ -472,7 +477,7 @@ public class World implements ActionListener {
 			if(meteorenabled) {
 				if(timeformeteor++>METEORCD) {
 					if((met!=null && met.disabled()) || met==null) {
-						met = new Meteor(new Point((int)(Math.random()*1200-100), (int)(Math.random()*1000-100)), (int)(Math.random()*10+15), new Point((int)(Math.random()*1200-100), (int)(Math.random()*1000-100)));
+						met = new Meteor(new Point((int)(Math.random()*1200-100), (int)(Math.random()*1000-100)), (int)(Math.random()*10+15), new Point((int)(Math.random()*1200-100), (int)(Math.random()*1000-100)), WORLDX, WORLDY);
 						timeformeteor=0;
 					}
 				}
@@ -616,9 +621,10 @@ public class World implements ActionListener {
 		return null;
 	}
 	public void playerclicking(Color which, Point where) {
+	  Point target = new Point(where);
 		for(Ship s : ships) {
 			if(s.player.equals(which)) {
-				s.setTarget(where);
+				s.setTarget(target);
 			}
 		}
 	}
@@ -687,7 +693,7 @@ public class World implements ActionListener {
 		@Override
 		public void mouseReleased(MouseEvent e) {	
 			if(met!=null && met.disabled())
-				met = new Meteor(pressed, 10, e.getPoint());
+				met = new Meteor(pressed, 10, e.getPoint(), WORLDX, WORLDY);
 		}
 	}
 	Point lookingat = new Point(0, 0);
@@ -810,8 +816,14 @@ public class World implements ActionListener {
 				gamestarted = true;
 				mframe.setVisible(true);
 				console.setTitle("Space Console  (Game Started)");
-        walls.add(new Wall(WORLDX/2 - WORLDX/14, WORLDY/2 - 10, WORLDX/7, 20));
-        walls.add(new Wall(WORLDX/2 - 10, WORLDY/2 - WORLDY/14, 20, WORLDY/7));
+        walls.add(new Wall(WORLDX/2 - WORLDX/7, WORLDY/2 - 10, WORLDX/14, 20));
+        walls.add(new Wall(WORLDX/2 - 10, WORLDY/2 - WORLDY/7, 20, WORLDY/14));
+        
+        walls.add(new Wall(WORLDX/2 + WORLDX/14, WORLDY/2 - 10, WORLDX/14, 20));
+        walls.add(new Wall(WORLDX/2 - 10, WORLDY/2 + WORLDY/14, 20, WORLDY/14));
+        for( int a = 0; a < 20; a++ ) {
+          walls.add(new Wall((int)(Math.random()*WORLDX), (int)(Math.random()*WORLDY), 20, 20));
+        }
 //				WORLDSIZE.set(2, WORLDX);
 //				WORLDSIZE.set(3, WORLDY);
 //				for(int a=connections.size()-1; a>=0; a--) {

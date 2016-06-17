@@ -11,7 +11,6 @@ public class Ship implements Serializable {
   public transient static long collisionTime;
   public transient static int collisionCalls;
   
-  
   public transient static boolean DRAWASCIRCLE = false;
 	public transient static int COUNTER;
 	public transient static World world;

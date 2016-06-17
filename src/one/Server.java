@@ -38,9 +38,9 @@ public class Server implements Runnable {
 				} else {
 //					hostout.writeInt(10012);
 //					hostout.writeInt(1);
+          output.close();
 					hostin.close();
 					hostout.close();
-					output.close();
 					
 				}
 			}

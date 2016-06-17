@@ -16,6 +16,8 @@ public class Meteor implements Serializable {
 	public int width = startingWidth;
 	public int half = 30;
 	transient ArrayList<Integer> state;
+	public int mapwidth;
+	public int mapheight;
 	
 	public Meteor(Meteor other ) { // virtual
 	  this.x = other.x;
@@ -31,7 +33,9 @@ public class Meteor implements Serializable {
 		state.add(y);
 		state.add(width);
 	}
-	public Meteor(Point start, int spd, Point end) {// actual create
+	public Meteor(Point start, int spd, Point end, int mapwidth, int mapheight) {// actual create
+	  this.mapwidth = mapwidth;
+	  this.mapheight = mapheight;
 		x = start.x;
 		y = start.y;
 		int ddx = end.x-start.x;
@@ -44,12 +48,12 @@ public class Meteor implements Serializable {
 		dx = (int)(ddx*ratio);
 		dy = (int)(ddy*ratio);
 		if(ddx<0) {
-			while(x<=1000+width && y>=-width && y<=800+width) {
+			while(x<=mapwidth+width && y>=-width && y<=mapheight+width) {
 				x-=dx;
 				y-=dy;
 			}
 		} else if(ddx>0) {
-			while(x>=-width && y>=-width && y<=800+width) {
+			while(x>=-width && y>=-width && y<=mapheight+width) {
 				x-=dx;
 				y-=dy;
 			}
@@ -60,11 +64,19 @@ public class Meteor implements Serializable {
 		state.add(width);
 	}
 	public void collidedwith(Ship s) {
-		s.damage(5);
+	  if( World.METEOR_GROWS_FAST ) {
+  		s.damage(1);
+      width+=4;
+      half+=2;
+	  }
+	  else {
+      s.damage(5);
+      width+=2;
+      half+=1;
+	  }
+		
 //		x = (int)(Math.random()*1000+100);
 //		y = (int)(Math.random()*1000+100);
-		width+=2;
-		half+=1;
 	}
 	public void draw(Graphics2D g, Point focus) {
 		g.setColor(Color.white);
